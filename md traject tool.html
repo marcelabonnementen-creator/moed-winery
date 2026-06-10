@@ -1,0 +1,2991 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MD-Trajectkompas — Marcel Foppen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root {
+  --ink: #0e1014;
+  --ink-2: #161922;
+  --ink-3: #1f232e;
+  --ink-4: #2a2f3c;
+  --paper: #f5f1e8;
+  --paper-dim: #d9d3c4;
+  --gold: #c9a961;
+  --gold-bright: #e6c478;
+  --gold-deep: #8a6d2e;
+  --rust: #b35642;
+  --moss: #6b7a4f;
+  --slate: #6c7280;
+  --line: #2a2f3c;
+  --line-light: rgba(201,169,97,0.18);
+  --blue: #5a7a9a;
+  --purple: #8568a0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--ink); color: var(--paper); font-family: 'Inter Tight', sans-serif; font-size: 15px; line-height: 1.55; min-height: 100vh; }
+body { background: radial-gradient(ellipse at top, #1a1d27 0%, var(--ink) 60%); }
+
+/* Header */
+header.app-header {
+  border-bottom: 1px solid var(--line);
+  padding: 28px 40px 24px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 40px;
+  background: linear-gradient(180deg, rgba(201,169,97,0.04) 0%, transparent 100%);
+}
+.brand { display: flex; flex-direction: column; gap: 4px; }
+.brand-mark { font-family: 'Fraunces', serif; font-weight: 300; font-size: 11px; letter-spacing: 0.42em; color: var(--gold); text-transform: uppercase; }
+.brand-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 32px; letter-spacing: -0.01em; line-height: 1; color: var(--paper); }
+.brand-title em { font-style: italic; color: var(--gold-bright); font-weight: 300; }
+.brand-sub { font-size: 12px; color: var(--slate); letter-spacing: 0.05em; margin-top: 6px; }
+
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.btn {
+  background: transparent; color: var(--paper); border: 1px solid var(--line);
+  padding: 9px 16px; font-family: inherit; font-size: 12px; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: all 0.15s ease;
+  border-radius: 1px;
+}
+.btn:hover { border-color: var(--gold); color: var(--gold-bright); }
+.btn-primary { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 600; }
+.btn-primary:hover { background: var(--gold-bright); color: var(--ink); }
+.btn-ghost { border-color: transparent; color: var(--slate); }
+.btn-ghost:hover { color: var(--gold); border-color: var(--line-light); }
+.btn-danger:hover { border-color: var(--rust); color: var(--rust); }
+.btn-sm { padding: 6px 10px; font-size: 10px; }
+
+/* Nav */
+nav.tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--line);
+  padding: 0 40px; background: var(--ink-2);
+  overflow-x: auto;
+}
+.tab {
+  padding: 16px 18px; background: transparent; border: none; color: var(--slate);
+  font-family: 'Fraunces', serif; font-size: 13px; letter-spacing: 0.03em;
+  cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all 0.2s ease; white-space: nowrap;
+  display: flex; align-items: center; gap: 8px;
+}
+.tab .num { font-size: 10px; color: var(--gold-deep); font-family: 'Inter Tight', sans-serif; letter-spacing: 0.15em; }
+.tab:hover { color: var(--paper); }
+.tab.active { color: var(--gold-bright); border-bottom-color: var(--gold); }
+.tab.active .num { color: var(--gold); }
+
+/* Main */
+main { padding: 40px; max-width: 1400px; margin: 0 auto; }
+.panel { display: none; animation: fadeIn 0.3s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.panel-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; gap: 30px; flex-wrap: wrap; }
+.panel-title { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 400; letter-spacing: -0.01em; line-height: 1.1; }
+.panel-title em { color: var(--gold-bright); font-weight: 300; }
+.panel-sub { color: var(--slate); font-size: 13px; margin-top: 8px; max-width: 640px; }
+
+/* Cards */
+.card {
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  padding: 24px;
+  margin-bottom: 16px;
+  border-radius: 2px;
+  position: relative;
+}
+.card.gold-edge { border-left: 2px solid var(--gold); }
+.card.rust-edge { border-left: 2px solid var(--rust); }
+.card.moss-edge { border-left: 2px solid var(--moss); }
+.card.blue-edge { border-left: 2px solid var(--blue); }
+.card.purple-edge { border-left: 2px solid var(--purple); }
+.card-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--paper); }
+.card-meta { font-size: 11px; color: var(--slate); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px; }
+.card-body { color: var(--paper-dim); font-size: 14px; line-height: 1.6; }
+
+/* Grid */
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 1100px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { .grid-3, .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+
+/* Form */
+label { display: block; font-size: 11px; color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; font-weight: 500; }
+input, textarea, select {
+  width: 100%; background: var(--ink-3); border: 1px solid var(--line);
+  color: var(--paper); padding: 10px 12px; font-family: inherit; font-size: 14px;
+  border-radius: 1px; transition: border-color 0.15s ease;
+}
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--gold); }
+textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-row.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.form-row.single { grid-template-columns: 1fr; }
+.field { margin-bottom: 14px; }
+
+/* Tracker — score pills */
+.scorepill { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.scorepill button {
+  background: var(--ink-3); border: 1px solid var(--line); color: var(--slate);
+  padding: 6px 10px; font-size: 11px; cursor: pointer; font-family: inherit;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.scorepill button.active { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 600; }
+.scorepill button:hover { color: var(--paper); }
+.scorepill button.active:hover { color: var(--ink); }
+
+/* Stats / metrics */
+.metric-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+@media (max-width: 900px) { .metric-strip { grid-template-columns: repeat(2, 1fr); } }
+.metric {
+  background: var(--ink-2); border: 1px solid var(--line);
+  padding: 18px 20px; border-radius: 2px;
+}
+.metric-label { font-size: 10px; color: var(--slate); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+.metric-value { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 400; color: var(--paper); line-height: 1; }
+.metric-value em { color: var(--gold-bright); font-style: normal; font-size: 14px; margin-left: 4px; letter-spacing: 0.05em; }
+.metric-trend { font-size: 11px; color: var(--moss); margin-top: 6px; }
+
+/* AI panel */
+.ai-section {
+  background: linear-gradient(135deg, rgba(201,169,97,0.06) 0%, rgba(179,86,66,0.04) 100%);
+  border: 1px solid var(--line-light);
+  padding: 24px; margin-top: 24px; border-radius: 2px;
+  position: relative;
+}
+.ai-section::before {
+  content: '◆'; position: absolute; top: 20px; right: 20px;
+  color: var(--gold); font-size: 14px;
+}
+.ai-section h3 { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; color: var(--gold-bright); margin-bottom: 6px; letter-spacing: 0.02em; }
+.ai-section p.ai-sub { color: var(--slate); font-size: 12px; margin-bottom: 14px; }
+.ai-output {
+  background: var(--ink); border: 1px solid var(--line); padding: 20px;
+  margin-top: 14px; font-size: 14px; line-height: 1.65; color: var(--paper-dim);
+  border-radius: 1px; white-space: pre-wrap; max-height: 600px; overflow-y: auto;
+}
+.ai-output h4 { font-family: 'Fraunces', serif; color: var(--gold-bright); margin-top: 16px; margin-bottom: 6px; font-size: 15px; font-weight: 500; }
+.ai-output h4:first-child { margin-top: 0; }
+.ai-output strong { color: var(--paper); }
+.ai-output em { color: var(--gold); font-style: normal; }
+
+/* Settings */
+.settings-card { background: var(--ink-2); border: 1px solid var(--line); padding: 28px; border-radius: 2px; margin-bottom: 20px; }
+.warn { background: rgba(179,86,66,0.08); border-left: 2px solid var(--rust); padding: 12px 16px; font-size: 13px; color: var(--paper-dim); margin: 14px 0; }
+.success { background: rgba(107,122,79,0.1); border-left: 2px solid var(--moss); padding: 12px 16px; font-size: 13px; color: var(--paper-dim); margin: 14px 0; }
+
+/* List items */
+.entry-list { display: flex; flex-direction: column; gap: 10px; }
+.entry-row {
+  display: grid; grid-template-columns: 90px 1fr auto; gap: 16px;
+  padding: 14px 18px; background: var(--ink-2); border: 1px solid var(--line);
+  align-items: center; border-radius: 1px;
+}
+.entry-date { font-family: 'Fraunces', serif; font-size: 13px; color: var(--gold); letter-spacing: 0.05em; }
+.entry-main { font-size: 14px; }
+.entry-main .entry-h { color: var(--paper); margin-bottom: 2px; }
+.entry-main .entry-d { color: var(--slate); font-size: 12px; }
+.entry-actions { display: flex; gap: 6px; }
+.icon-btn {
+  background: transparent; border: 1px solid var(--line); color: var(--slate);
+  width: 28px; height: 28px; cursor: pointer; font-size: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.icon-btn:hover { color: var(--gold); border-color: var(--gold); }
+.icon-btn.danger:hover { color: var(--rust); border-color: var(--rust); }
+
+/* Empty states */
+.empty { padding: 40px; text-align: center; color: var(--slate); font-style: italic; font-family: 'Fraunces', serif; border: 1px dashed var(--line); border-radius: 2px; }
+
+/* Tag / badge */
+.tag { display: inline-block; padding: 2px 8px; background: var(--ink-3); border: 1px solid var(--line); color: var(--paper-dim); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; margin-right: 4px; border-radius: 1px; }
+.tag.gold { color: var(--gold); border-color: var(--gold-deep); }
+.tag.rust { color: var(--rust); border-color: rgba(179,86,66,0.4); }
+.tag.moss { color: var(--moss); border-color: rgba(107,122,79,0.4); }
+.tag.blue { color: var(--blue); border-color: rgba(90,122,154,0.4); }
+.tag.purple { color: var(--purple); border-color: rgba(133,104,160,0.4); }
+
+/* Spinner */
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--ink-3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Assessment-snapshot blocks */
+.assessment-block { background: var(--ink-2); border-left: 2px solid var(--gold); padding: 20px 24px; margin-bottom: 14px; border-radius: 1px; }
+.assessment-block h4 { font-family: 'Fraunces', serif; color: var(--gold-bright); font-size: 15px; margin-bottom: 8px; font-weight: 500; }
+.assessment-block p { color: var(--paper-dim); font-size: 14px; line-height: 1.6; }
+.assessment-block .quote { font-style: italic; color: var(--paper); border-left: 1px solid var(--gold); padding-left: 14px; margin: 10px 0; }
+
+.ornament { color: var(--gold-deep); font-family: 'Fraunces', serif; font-size: 14px; letter-spacing: 0.5em; text-align: center; margin: 28px 0; }
+
+/* Footer hint */
+.footer-hint { text-align: center; color: var(--slate); font-size: 11px; padding: 30px 20px 40px; letter-spacing: 0.06em; }
+.footer-hint em { color: var(--gold); font-style: italic; }
+
+/* Number markers on form headers */
+.form-marker { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.form-marker .num { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold); font-size: 24px; }
+.form-marker .lbl { font-family: 'Fraunces', serif; font-size: 17px; color: var(--paper); }
+
+/* Role profile cards */
+.role-card {
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  padding: 24px;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+}
+.role-card.role-leidinggevende { border-top: 3px solid var(--blue); }
+.role-card.role-sponsor { border-top: 3px solid var(--gold); }
+.role-card.role-md_adviseur { border-top: 3px solid var(--purple); }
+.role-card.role-begeleider { border-top: 3px solid var(--moss); }
+.role-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.role-name { font-family: 'Fraunces', serif; font-size: 19px; color: var(--paper); margin-bottom: 2px; }
+.role-type { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--slate); }
+.role-purpose { font-size: 12px; color: var(--paper-dim); font-style: italic; line-height: 1.5; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.role-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: auto; padding-top: 12px; }
+.role-stat { text-align: center; }
+.role-stat .v { font-family: 'Fraunces', serif; font-size: 20px; color: var(--gold-bright); }
+.role-stat .l { font-size: 9px; color: var(--slate); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+
+/* Status badges for actions */
+.status-open { color: var(--gold); }
+.status-done { color: var(--moss); }
+.status-blocked { color: var(--rust); }
+.status-parked { color: var(--slate); }
+
+.deadline-soon { color: var(--rust); font-weight: 600; }
+.deadline-ok { color: var(--paper-dim); }
+.deadline-overdue { color: var(--rust); font-weight: 600; text-decoration: line-through; }
+
+/* Detail block on role pages */
+.detail-list { display: flex; flex-direction: column; gap: 8px; }
+.detail-item {
+  padding: 12px 16px;
+  background: var(--ink-2);
+  border-left: 2px solid var(--line);
+  border-radius: 1px;
+  font-size: 13px;
+}
+.detail-item.tag-coach { border-left-color: var(--moss); }
+.detail-item.tag-sparring { border-left-color: var(--blue); }
+.detail-item.tag-actie { border-left-color: var(--gold); }
+.detail-item.tag-afspraak { border-left-color: var(--purple); }
+.detail-item .di-meta { color: var(--slate); font-size: 11px; letter-spacing: 0.05em; margin-bottom: 4px; }
+.detail-item .di-content { color: var(--paper-dim); }
+
+/* Filter bar */
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.filter-bar .filter-label { font-size: 11px; color: var(--slate); letter-spacing: 0.1em; text-transform: uppercase; margin-right: 6px; }
+.filter-chip {
+  background: var(--ink-3); border: 1px solid var(--line); color: var(--paper-dim);
+  padding: 5px 12px; font-size: 11px; cursor: pointer; font-family: inherit;
+  letter-spacing: 0.05em; border-radius: 12px; transition: all 0.15s;
+}
+.filter-chip.active { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 600; }
+.filter-chip:hover { border-color: var(--gold); }
+
+/* Opleidingen */
+.opl-card {
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  padding: 22px 24px;
+  margin-bottom: 14px;
+  border-radius: 2px;
+  position: relative;
+}
+.opl-card.afgerond { opacity: 0.7; border-left-color: var(--moss); }
+.opl-card.gepland { border-left-color: var(--blue); }
+.opl-card.bezig { border-left-color: var(--gold); }
+.opl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+.opl-titel { font-family: 'Fraunces', serif; font-size: 19px; color: var(--paper); margin-bottom: 4px; line-height: 1.2; }
+.opl-aanbieder { font-size: 12px; color: var(--slate); letter-spacing: 0.04em; }
+.opl-meta { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 0 12px; font-size: 12px; color: var(--paper-dim); }
+.opl-meta span strong { color: var(--gold); font-weight: 500; }
+.opl-doel { font-size: 13px; color: var(--paper-dim); margin: 10px 0 14px; padding: 10px 14px; background: var(--ink-3); border-left: 1px solid var(--gold-deep); }
+.opl-doel em { color: var(--gold); font-style: normal; }
+
+.opl-uploads {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 12px;
+}
+.opl-uploads-title { font-size: 10px; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+.upload-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.upload-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; background: var(--ink-3); border: 1px solid var(--line);
+  font-size: 13px; border-radius: 1px;
+}
+.upload-item .u-name { color: var(--paper); display: flex; align-items: center; gap: 8px; }
+.upload-item .u-icon { color: var(--gold); font-family: 'Fraunces', serif; font-style: italic; }
+.upload-item .u-size { color: var(--slate); font-size: 11px; margin-left: 8px; }
+.upload-item .u-actions { display: flex; gap: 4px; }
+.drop-zone {
+  border: 1px dashed var(--line);
+  padding: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--slate);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 1px;
+}
+.drop-zone:hover { border-color: var(--gold); color: var(--gold); }
+.drop-zone.dragover { border-color: var(--gold); background: rgba(201,169,97,0.05); color: var(--gold-bright); }
+
+.storage-warn {
+  font-size: 11px; color: var(--slate); margin-top: 8px; text-align: right;
+}
+.storage-warn.warn { color: var(--rust); }
+
+.opl-actions-bar { display: flex; gap: 6px; justify-content: flex-end; margin-top: 14px; }
+
+.opl-notitie {
+  font-size: 13px; color: var(--paper-dim); margin-top: 12px;
+  padding-top: 12px; border-top: 1px dotted var(--line); line-height: 1.6;
+}
+.opl-notitie strong { color: var(--gold); font-weight: 500; }
+
+/* === MATCH MODULE === */
+.match-input-card { background: var(--ink-2); border: 1px solid var(--line); padding: 28px; margin-bottom: 20px; border-radius: 2px; }
+.match-tab-toggle { display: flex; gap: 0; margin-bottom: 18px; border: 1px solid var(--line); border-radius: 1px; overflow: hidden; width: fit-content; }
+.match-tab-toggle button {
+  background: transparent; border: none; color: var(--slate);
+  padding: 9px 18px; font-family: 'Fraunces', serif; font-size: 13px;
+  cursor: pointer; letter-spacing: 0.04em; transition: all 0.15s;
+}
+.match-tab-toggle button.active { background: var(--gold); color: var(--ink); font-weight: 600; }
+.match-tab-toggle button:hover:not(.active) { color: var(--paper); }
+
+.match-history-list { display: flex; flex-direction: column; gap: 10px; }
+.match-history-row {
+  display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: center;
+  padding: 14px 18px; background: var(--ink-2); border: 1px solid var(--line);
+}
+.match-history-row .mh-titel { font-family: 'Fraunces', serif; font-size: 16px; color: var(--paper); }
+.match-history-row .mh-meta { font-size: 11px; color: var(--slate); letter-spacing: 0.05em; }
+
+.match-score-block {
+  background: linear-gradient(135deg, rgba(201,169,97,0.08) 0%, rgba(107,122,79,0.04) 100%);
+  border: 1px solid var(--line-light);
+  padding: 28px; margin: 24px 0; border-radius: 2px;
+  text-align: center;
+}
+.match-score-circle {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  position: relative;
+  margin-bottom: 14px;
+}
+.match-score-num { font-family: 'Fraunces', serif; font-size: 56px; font-weight: 400; line-height: 1; }
+.match-score-label { font-size: 10px; letter-spacing: 0.2em; color: var(--slate); text-transform: uppercase; margin-top: 6px; }
+.match-verdict { font-family: 'Fraunces', serif; font-size: 18px; color: var(--paper); margin-top: 12px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.4; }
+.match-verdict em { color: var(--gold-bright); font-style: italic; font-weight: 300; }
+
+.match-pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+@media (max-width: 900px) { .match-pillars { grid-template-columns: repeat(2, 1fr); } }
+.match-pillar {
+  background: var(--ink-2); border: 1px solid var(--line);
+  padding: 14px 16px; border-radius: 2px; text-align: center;
+}
+.match-pillar .mp-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); margin-bottom: 6px; }
+.match-pillar .mp-score { font-family: 'Fraunces', serif; font-size: 28px; line-height: 1; }
+.match-pillar.high .mp-score { color: var(--moss); }
+.match-pillar.mid .mp-score { color: var(--gold); }
+.match-pillar.low .mp-score { color: var(--rust); }
+.match-pillar .mp-bar { height: 3px; background: var(--ink-3); margin-top: 8px; overflow: hidden; }
+.match-pillar .mp-fill { height: 100%; background: var(--gold); transition: width 0.5s; }
+
+.match-section { background: var(--ink-2); border-left: 2px solid var(--gold); padding: 20px 24px; margin-bottom: 14px; border-radius: 1px; }
+.match-section h4 { font-family: 'Fraunces', serif; color: var(--gold-bright); font-size: 16px; margin-bottom: 8px; font-weight: 500; }
+.match-section.green { border-left-color: var(--moss); }
+.match-section.green h4 { color: var(--moss); }
+.match-section.red { border-left-color: var(--rust); }
+.match-section.red h4 { color: var(--rust); }
+.match-section.amber { border-left-color: var(--gold); }
+.match-section ul { list-style: none; padding: 0; }
+.match-section li { padding: 6px 0; color: var(--paper-dim); font-size: 14px; line-height: 1.55; padding-left: 18px; position: relative; }
+.match-section li::before { content: '▸'; position: absolute; left: 0; color: var(--gold); }
+.match-section p { color: var(--paper-dim); font-size: 14px; line-height: 1.6; }
+
+.vacature-extract { background: var(--ink-3); border: 1px solid var(--line); padding: 16px 20px; margin-bottom: 16px; font-size: 13px; color: var(--paper-dim); border-radius: 1px; max-height: 240px; overflow-y: auto; line-height: 1.5; }
+.vacature-extract h5 { color: var(--gold); font-family: 'Fraunces', serif; font-size: 13px; margin-bottom: 8px; }
+
+/* === CHART === */
+.chart-card { background: var(--ink-2); border: 1px solid var(--line); padding: 24px; margin-bottom: 16px; border-radius: 2px; }
+.chart-title { font-family: 'Fraunces', serif; font-size: 16px; color: var(--paper); margin-bottom: 4px; }
+.chart-sub { font-size: 11px; color: var(--slate); letter-spacing: 0.05em; margin-bottom: 16px; }
+.chart-canvas { width: 100%; height: 180px; position: relative; }
+.chart-empty { text-align: center; color: var(--slate); font-style: italic; padding: 40px 20px; font-family: 'Fraunces', serif; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <div class="brand-mark">◆ Management Development</div>
+    <div class="brand-title">Trajectkompas<em> — voor Marcel</em></div>
+    <div class="brand-sub">Voortgangsinstrument · Tweede Echelon · UWV</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn" onclick="exportJSON()">↓ Export JSON</button>
+    <button class="btn" onclick="document.getElementById('importFile').click()">↑ Import</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+    <button class="btn btn-ghost btn-sm" onclick="switchTab('instellingen')">⚙ Instellingen</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="overzicht"><span class="num">00</span>Overzicht</button>
+  <button class="tab" data-tab="ontwikkellijnen"><span class="num">01</span>Ontwikkellijnen</button>
+  <button class="tab" data-tab="spanning"><span class="num">02</span>Spanning</button>
+  <button class="tab" data-tab="rollen"><span class="num">03</span>Stakeholders</button>
+  <button class="tab" data-tab="afspraken"><span class="num">04</span>Afspraken</button>
+  <button class="tab" data-tab="acties"><span class="num">05</span>Acties</button>
+  <button class="tab" data-tab="sparring"><span class="num">06</span>Sparring</button>
+  <button class="tab" data-tab="opleidingen"><span class="num">07</span>Opleidingen</button>
+  <button class="tab" data-tab="leeslijst"><span class="num">08</span>Leeslijst</button>
+  <button class="tab" data-tab="match"><span class="num">09</span>Vacaturematch</button>
+  <button class="tab" data-tab="assessment"><span class="num">10</span>Assessment</button>
+  <button class="tab" data-tab="instellingen"><span class="num">11</span>Instellingen</button>
+</nav>
+
+<main>
+
+<!-- 00 OVERZICHT -->
+<section class="panel active" id="panel-overzicht">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Stand <em>van</em> het traject</h1>
+      <p class="panel-sub">Een dwarsdoorsnede van waar je staat op je drie ontwikkellijnen, je spanningspatroon, openstaande acties, en de vierhoek van rollen rond je traject.</p>
+    </div>
+  </div>
+
+  <div class="metric-strip">
+    <div class="metric">
+      <div class="metric-label">Ontwikkellijn-logs</div>
+      <div class="metric-value" id="m-ontwikkel">0<em>logs</em></div>
+      <div class="metric-trend" id="m-ontwikkel-trend">—</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Spanningslogs</div>
+      <div class="metric-value" id="m-spanning">0<em>logs</em></div>
+      <div class="metric-trend" id="m-spanning-trend">—</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Open acties</div>
+      <div class="metric-value" id="m-acties">0<em>open</em></div>
+      <div class="metric-trend" id="m-acties-trend">—</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Komende afspraken</div>
+      <div class="metric-value" id="m-afspraken">0<em>komend</em></div>
+      <div class="metric-trend" id="m-afspraken-trend">—</div>
+    </div>
+  </div>
+
+  <div class="ornament">⸻ ◆ ⸻</div>
+
+  <div class="grid-2" id="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Norm-op-tafel — beweging over tijd</div>
+      <div class="chart-sub">Percentage registraties waarin positie binnen 5 min op tafel lag, per maand</div>
+      <div class="chart-canvas" id="chart-norm"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Gemiddeld spanningsniveau — per maand</div>
+      <div class="chart-sub">Lager is rustiger. 0 = rust, 5 = overdrive.</div>
+      <div class="chart-canvas" id="chart-spanning"></div>
+    </div>
+  </div>
+
+  <div class="ornament">⸻ ◆ ⸻</div>
+
+  <div class="grid-3">
+    <div class="card gold-edge">
+      <div class="card-title">Norm vooraf uitspreken</div>
+      <div class="card-meta">Ontwikkellijn 01</div>
+      <div class="card-body" id="summary-norm">Nog geen data.</div>
+    </div>
+    <div class="card gold-edge">
+      <div class="card-title">Bestuurlijke sensitiviteit</div>
+      <div class="card-meta">Ontwikkellijn 02</div>
+      <div class="card-body" id="summary-stakeholder">Nog geen data.</div>
+    </div>
+    <div class="card gold-edge">
+      <div class="card-title">Dosering doorbreken</div>
+      <div class="card-meta">Ontwikkellijn 03</div>
+      <div class="card-body" id="summary-dosering">Nog geen data.</div>
+    </div>
+  </div>
+
+  <div class="ai-section">
+    <h3>AI-synthese — waar sta je nu?</h3>
+    <p class="ai-sub">Geanonimiseerde samenvatting van al je data + assessmentprofiel naar Claude. Vraagt om observaties, patronen, blinde vlekken en concrete aanbevelingen — inclusief de vierhoek van rollen.</p>
+    <button class="btn btn-primary" onclick="runAISynthese()" id="btn-synthese">◆ Genereer synthese</button>
+    <div class="ai-output" id="ai-out-synthese" style="display:none"></div>
+  </div>
+</section>
+
+<!-- 01 ONTWIKKELLIJNEN -->
+<section class="panel" id="panel-ontwikkellijnen">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Drie <em>ontwikkellijnen</em></h1>
+      <p class="panel-sub">Norm uitspreken · Bestuurlijke sensitiviteit · Dosering. Registreer kort wat er gebeurde — een paar regels per veld.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openOntwikkelForm()">+ Nieuwe registratie</button>
+  </div>
+
+  <div id="ontwikkel-form" style="display:none">
+    <div class="card">
+      <div class="card-title" id="ontwikkel-form-title">Nieuwe registratie</div>
+      <div class="form-row">
+        <div class="field"><label>Datum</label><input type="date" id="o-datum"></div>
+        <div class="field"><label>Context / overleg</label><input type="text" id="o-context" placeholder="Bijv. UDU-stuurgroep, MT VFV"></div>
+      </div>
+      <div class="form-marker"><span class="num">i.</span><span class="lbl">Norm vooraf uitspreken</span></div>
+      <div class="form-row">
+        <div class="field"><label>Lag mijn positie in eerste 5 min op tafel?</label>
+          <div class="scorepill" id="score-norm">
+            <button data-val="ja">Ja</button><button data-val="deels">Deels</button><button data-val="nee">Nee</button><button data-val="nvt">N.v.t.</button>
+          </div>
+        </div>
+        <div class="field"><label>Wat ik vooraf wilde inbrengen</label><textarea id="o-norm-vooraf" rows="2"></textarea></div>
+      </div>
+      <div class="field"><label>Wat er werkelijk gebeurde &amp; waarom</label><textarea id="o-norm-feitelijk" rows="2"></textarea></div>
+      <div class="form-marker"><span class="num">ii.</span><span class="lbl">Stakeholder- &amp; belangenanalyse</span></div>
+      <div class="form-row">
+        <div class="field"><label>Belangrijkste belangen / spanningen</label><textarea id="o-stake-belangen" rows="2"></textarea></div>
+        <div class="field"><label>Timing &amp; sparring</label><textarea id="o-stake-timing" rows="2"></textarea></div>
+      </div>
+      <div class="form-marker"><span class="num">iii.</span><span class="lbl">Dosering</span></div>
+      <div class="form-row">
+        <div class="field"><label>Spanningsniveau (0—5)</label>
+          <div class="scorepill" id="score-spanning-tracker">
+            <button data-val="0">0</button><button data-val="1">1</button><button data-val="2">2</button><button data-val="3">3</button><button data-val="4">4</button><button data-val="5">5</button>
+          </div>
+        </div>
+        <div class="field"><label>Lopende initiatieven nog niet afgerond?</label><input type="number" id="o-dos-aantal" min="0"></div>
+      </div>
+      <div class="field"><label>Wat hier beter werkt: kiezen of meer doen?</label><textarea id="o-dos-reflectie" rows="2"></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:18px;">
+        <button class="btn btn-primary" onclick="saveOntwikkel()">Opslaan</button>
+        <button class="btn btn-ghost" onclick="closeOntwikkelForm()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ontwikkel-list" class="entry-list" style="margin-top:18px"></div>
+
+  <div class="ai-section">
+    <h3>AI-feedback — analyseer mijn patronen</h3>
+    <p class="ai-sub">Trends, terugkerende patronen en verbeterpunten op de drie lijnen.</p>
+    <button class="btn btn-primary" onclick="runAIOntwikkel()">◆ Analyseer ontwikkellijnen</button>
+    <div class="ai-output" id="ai-out-ontwikkel" style="display:none"></div>
+  </div>
+</section>
+
+<!-- 02 SPANNING -->
+<section class="panel" id="panel-spanning">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Spanning &amp; <em>overdrive</em></h1>
+      <p class="panel-sub">Niet wat je deed, maar welke overtuiging op dat moment actief was.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openSpanningForm()">+ Nieuwe log</button>
+  </div>
+
+  <div id="spanning-form" style="display:none">
+    <div class="card rust-edge">
+      <div class="card-title" id="spanning-form-title">Spanningslog</div>
+      <div class="form-row three">
+        <div class="field"><label>Datum</label><input type="date" id="s-datum"></div>
+        <div class="field"><label>Trigger / context</label><input type="text" id="s-context"></div>
+        <div class="field"><label>Niveau (0—5)</label>
+          <div class="scorepill" id="score-spanning">
+            <button data-val="0">0</button><button data-val="1">1</button><button data-val="2">2</button><button data-val="3">3</button><button data-val="4">4</button><button data-val="5">5</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Lichaam &amp; gedrag</label><textarea id="s-gedrag" rows="3"></textarea></div>
+        <div class="field"><label>Welke overtuiging was actief?</label><textarea id="s-overtuiging" rows="3"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Werkte de overtuiging vóór of tegen?</label>
+          <select id="s-werkte">
+            <option value="">— kies —</option>
+            <option value="voor">Vóór mij</option>
+            <option value="tegen">Tegen mij</option>
+            <option value="beide">Beide</option>
+          </select>
+        </div>
+        <div class="field"><label>Wat zou een alternatief zijn?</label><textarea id="s-alternatief" rows="2"></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-primary" onclick="saveSpanning()">Opslaan</button>
+        <button class="btn btn-ghost" onclick="closeSpanningForm()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="spanning-list" class="entry-list" style="margin-top:18px"></div>
+
+  <div class="ai-section">
+    <h3>AI-analyse — welke overtuiging komt het vaakst terug?</h3>
+    <button class="btn btn-primary" onclick="runAISpanning()">◆ Analyseer spanningspatronen</button>
+    <div class="ai-output" id="ai-out-spanning" style="display:none"></div>
+  </div>
+</section>
+
+<!-- 03 ROLLEN / STAKEHOLDERS -->
+<section class="panel" id="panel-rollen">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Stakeholders &amp; <em>rollen</em></h1>
+      <p class="panel-sub">Vier soorten waarheid over je voortgang: leidinggevende ziet output, sponsor ziet potentie, MD-adviseur ziet proces, begeleider ziet patroon. Convergentie is signaal — divergentie is informatie.</p>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openRolForm()">+ Wijzig rolinvulling</button>
+  </div>
+
+  <div class="grid-4" id="role-cards"></div>
+
+  <div id="rol-form" style="display:none; margin-top: 20px;">
+    <div class="card">
+      <div class="card-title">Rolprofielen bewerken</div>
+      <p style="color: var(--slate); font-size: 13px; margin-bottom: 18px;">Vul per rol de persoon en eigen aantekeningen. Cadans en verwachtingen helpen je bij het beoordelen of de relatie levert wat hij moet leveren.</p>
+      <div id="rol-form-fields"></div>
+      <div style="display:flex;gap:10px;margin-top:18px;">
+        <button class="btn btn-primary" onclick="saveRollen()">Opslaan</button>
+        <button class="btn btn-ghost" onclick="closeRolForm()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ornament">⸻ ◆ ⸻</div>
+
+  <h2 style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 400; margin-bottom: 8px;">Per rol — <em style="color: var(--gold-bright); font-style: italic;">wat er loopt</em></h2>
+  <p class="panel-sub" style="margin-bottom: 24px;">Overzicht van sparringgesprekken, afspraken en acties gekoppeld aan elke rol.</p>
+
+  <div id="role-detail-blocks"></div>
+
+  <div class="ai-section">
+    <h3>AI-analyse — de vierhoek van rollen</h3>
+    <p class="ai-sub">Wat zegt elke rol over je voortgang? Waar convergeren de signalen, waar divergeren ze? Welke rol gebruik je onvoldoende, en wat zegt dát?</p>
+    <button class="btn btn-primary" onclick="runAIRollen()">◆ Analyseer rolvierhoek</button>
+    <div class="ai-output" id="ai-out-rollen" style="display:none"></div>
+  </div>
+</section>
+
+<!-- 04 AFSPRAKEN -->
+<section class="panel" id="panel-afspraken">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Afspraken <em>(structurele cadans)</em></h1>
+      <p class="panel-sub">Terugkerende afspraakmomenten: maandelijkse 1-op-1, kwartaalreview, coachsessies. Niet de gesprekken zelf (die gaan in Sparring), maar wel de afspraakritmes met deelnemers, frequentie en evaluatie.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openAfspraakForm()">+ Nieuwe afspraak</button>
+  </div>
+
+  <div id="afspraak-form" style="display:none">
+    <div class="card purple-edge">
+      <div class="card-title" id="afspraak-form-title">Afspraak / cadans</div>
+      <div class="form-row">
+        <div class="field"><label>Titel</label><input type="text" id="af-titel" placeholder="Bijv. Maandelijkse 1-op-1 leidinggevende"></div>
+        <div class="field"><label>Met wie / rol</label>
+          <select id="af-rol">
+            <option value="">— kies rol —</option>
+            <option value="leidinggevende">Leidinggevende</option>
+            <option value="sponsor">Sponsor</option>
+            <option value="md_adviseur">MD-adviseur</option>
+            <option value="begeleider">Begeleider / coach</option>
+            <option value="peer">Peer / collega-manager</option>
+            <option value="anders">Anders</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row three">
+        <div class="field"><label>Frequentie</label>
+          <select id="af-freq">
+            <option value="wekelijks">Wekelijks</option>
+            <option value="2-wekelijks">Tweewekelijks</option>
+            <option value="maandelijks" selected>Maandelijks</option>
+            <option value="6-wekelijks">Zeswekelijks</option>
+            <option value="kwartaal">Per kwartaal</option>
+            <option value="halfjaarlijks">Halfjaarlijks</option>
+            <option value="adhoc">Ad hoc</option>
+          </select>
+        </div>
+        <div class="field"><label>Volgende moment</label><input type="date" id="af-volgend"></div>
+        <div class="field"><label>Status</label>
+          <select id="af-status">
+            <option value="actief">Actief</option>
+            <option value="gepland">Gepland</option>
+            <option value="gepauzeerd">Gepauzeerd</option>
+            <option value="afgerond">Afgerond</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Doel van deze afspraak</label><textarea id="af-doel" rows="2" placeholder="Wat moet hier structureel uitkomen?"></textarea></div>
+      <div class="field"><label>Wat ik bewaak in deze relatie (verwachtingen, signalen)</label><textarea id="af-bewaak" rows="2"></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-primary" onclick="saveAfspraak()">Opslaan</button>
+        <button class="btn btn-ghost" onclick="closeAfspraakForm()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">Filter rol:</span>
+    <button class="filter-chip active" data-filter="all" onclick="filterAfspraken('all')">Alle</button>
+    <button class="filter-chip" data-filter="leidinggevende" onclick="filterAfspraken('leidinggevende')">Leidinggevende</button>
+    <button class="filter-chip" data-filter="sponsor" onclick="filterAfspraken('sponsor')">Sponsor</button>
+    <button class="filter-chip" data-filter="md_adviseur" onclick="filterAfspraken('md_adviseur')">MD-adviseur</button>
+    <button class="filter-chip" data-filter="begeleider" onclick="filterAfspraken('begeleider')">Begeleider</button>
+  </div>
+
+  <div id="afspraak-list" class="entry-list"></div>
+</section>
+
+<!-- 05 ACTIES -->
+<section class="panel" id="panel-acties">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Acties <em>(eenmalig, met deadline)</em></h1>
+      <p class="panel-sub">Concrete to-do's uit gesprekken, AI-aanbevelingen of eigen reflectie. Met deadline, eigenaar, en koppeling aan rol of ontwikkellijn.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openActieForm()">+ Nieuwe actie</button>
+  </div>
+
+  <div id="actie-form" style="display:none">
+    <div class="card gold-edge">
+      <div class="card-title" id="actie-form-title">Actie</div>
+      <div class="form-row">
+        <div class="field"><label>Wat ga je doen?</label><input type="text" id="ac-titel" placeholder="Korte titel"></div>
+        <div class="field"><label>Deadline</label><input type="date" id="ac-deadline"></div>
+      </div>
+      <div class="form-row three">
+        <div class="field"><label>Koppeling aan rol</label>
+          <select id="ac-rol">
+            <option value="">— geen / eigen actie —</option>
+            <option value="leidinggevende">Leidinggevende</option>
+            <option value="sponsor">Sponsor</option>
+            <option value="md_adviseur">MD-adviseur</option>
+            <option value="begeleider">Begeleider</option>
+            <option value="peer">Peer</option>
+          </select>
+        </div>
+        <div class="field"><label>Ontwikkellijn</label>
+          <select id="ac-lijn">
+            <option value="">— geen specifieke —</option>
+            <option value="norm">01 Norm uitspreken</option>
+            <option value="sensitiviteit">02 Bestuurlijke sensitiviteit</option>
+            <option value="dosering">03 Dosering</option>
+            <option value="zorg">Drijfveer Zorg</option>
+          </select>
+        </div>
+        <div class="field"><label>Status</label>
+          <select id="ac-status">
+            <option value="open">Open</option>
+            <option value="bezig">Bezig</option>
+            <option value="geblokkeerd">Geblokkeerd</option>
+            <option value="afgerond">Afgerond</option>
+            <option value="geparkeerd">Geparkeerd</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Achtergrond / waarom deze actie?</label><textarea id="ac-achtergrond" rows="3"></textarea></div>
+      <div class="field"><label>Definition of done — wanneer is dit klaar?</label><textarea id="ac-dod" rows="2"></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-primary" onclick="saveActie()">Opslaan</button>
+        <button class="btn btn-ghost" onclick="closeActieForm()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">Filter status:</span>
+    <button class="filter-chip active" data-actief-status="all" onclick="filterActies('all', null)">Alle</button>
+    <button class="filter-chip" data-actief-status="open" onclick="filterActies('open', null)">Open</button>
+    <button class="filter-chip" data-actief-status="bezig" onclick="filterActies('bezig', null)">Bezig</button>
+    <button class="filter-chip" data-actief-status="afgerond" onclick="filterActies('afgerond', null)">Afgerond</button>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Filter rol:</span>
+    <button class="filter-chip active" data-actief-rol="all" onclick="filterActies(null, 'all')">Alle</button>
+    <button class="filter-chip" data-actief-rol="leidinggevende" onclick="filterActies(null, 'leidinggevende')">Leidinggevende</button>
+    <button class="filter-chip" data-actief-rol="sponsor" onclick="filterActies(null, 'sponsor')">Sponsor</button>
+    <button class="filter-chip" data-actief-rol="md_adviseur" onclick="filterActies(null, 'md_adviseur')">MD-adviseur</button>
+    <button class="filter-chip" data-actief-rol="begeleider" onclick="filterActies(null, 'begeleider')">Begeleider</button>
+  </div>
+
+  <div id="actie-list" class="entry-list"></div>
+
+  <div class="ai-section">
+    <h3>AI-prioritering — wat eerst?</h3>
+    <p class="ai-sub">Op basis van je ontwikkellijnen, deadlines en patronen: welke acties zou je deze week eerst oppakken, en welke kun je beter parkeren?</p>
+    <button class="btn btn-primary" onclick="runAIActies()">◆ Prioriteer acties</button>
+    <div class="ai-output" id="ai-out-acties" style="display:none"></div>
+  </div>
+</section>
+
+<!-- 06 SPARRING -->
+<section class="panel" id="panel-sparring">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Sparring &amp; <em>coaching</em></h1>
+      <p class="panel-sub">Individuele gesprekken — voorbereiding én nabewerking.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openSparringForm()">+ Nieuw gesprek</button>
+  </div>
+
+  <div id="sparring-form" style="display:none">
+    <div class="card">
+      <div class="card-title" id="sparring-form-title">Gespreksvoorbereiding / nabewerking</div>
+      <div class="form-row three">
+        <div class="field"><label>Datum</label><input type="date" id="sp-datum"></div>
+        <div class="field"><label>Gesprekspartner</label><input type="text" id="sp-partner"></div>
+        <div class="field"><label>Rol</label>
+          <select id="sp-rol">
+            <option value="">— kies rol —</option>
+            <option value="leidinggevende">Leidinggevende</option>
+            <option value="sponsor">Sponsor</option>
+            <option value="md_adviseur">MD-adviseur</option>
+            <option value="begeleider">Begeleider / coach</option>
+            <option value="peer">Peer / collega-manager</option>
+            <option value="anders">Anders</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Hoofdvraag die ik inbreng</label><textarea id="sp-vraag" rows="2"></textarea></div>
+        <div class="field"><label>Welke ontwikkellijn raakt dit?</label>
+          <select id="sp-lijn">
+            <option value="">— kies —</option>
+            <option value="norm">01 Norm uitspreken</option>
+            <option value="sensitiviteit">02 Bestuurlijke sensitiviteit</option>
+            <option value="dosering">03 Dosering</option>
+            <option value="zorg">Drijfveer Zorg</option>
+            <option value="meerdere">Meerdere / overstijgend</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Belangrijkste inzicht / feedback</label><textarea id="sp-inzicht" rows="3"></textarea></div>
+      <div class="field"><label>Concrete actie tot volgende keer</label><textarea id="sp-actie" rows="2"></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-primary" onclick="saveSparring()">Opslaan</button>
+        <button class="btn btn-ghost" onclick="closeSparringForm()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="sparring-list" class="entry-list" style="margin-top:18px"></div>
+
+  <div class="ai-section">
+    <h3>AI-spiegel — wat hoor je niet?</h3>
+    <button class="btn btn-primary" onclick="runAISparring()">◆ Genereer spiegel</button>
+    <div class="ai-output" id="ai-out-sparring" style="display:none"></div>
+  </div>
+</section>
+
+<!-- 07 OPLEIDINGEN -->
+<section class="panel" id="panel-opleidingen">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Opleidingen &amp; <em>trainingen</em></h1>
+      <p class="panel-sub">Wat ga je volgen, wat heb je gevolgd, en wat is het opgeleverd? Upload hand-outs, sheets, certificaten en notities zodat de AI bij analyses je leerstof als context kan gebruiken.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openOpleidingForm()">+ Opleiding toevoegen</button>
+  </div>
+
+  <div id="opleiding-form" style="display:none">
+    <div class="card gold-edge">
+      <div class="card-title" id="opleiding-form-title">Opleiding / training</div>
+      <div class="form-row">
+        <div class="field"><label>Titel</label><input type="text" id="op-titel" placeholder="Bijv. Strategisch Adviseren in de Publieke Sector"></div>
+        <div class="field"><label>Aanbieder / docent</label><input type="text" id="op-aanbieder" placeholder="Bijv. Bestuursacademie Nederland"></div>
+      </div>
+      <div class="form-row four">
+        <div class="field"><label>Status</label>
+          <select id="op-status">
+            <option value="gepland">Gepland</option>
+            <option value="bezig">Bezig</option>
+            <option value="afgerond">Afgerond</option>
+            <option value="geparkeerd">Geparkeerd</option>
+          </select>
+        </div>
+        <div class="field"><label>Type</label>
+          <select id="op-type">
+            <option value="opleiding">Opleiding (meerdaags)</option>
+            <option value="training">Training</option>
+            <option value="masterclass">Masterclass</option>
+            <option value="seminar">Seminar / congres</option>
+            <option value="workshop">Workshop</option>
+            <option value="online">Online cursus</option>
+          </select>
+        </div>
+        <div class="field"><label>Startdatum</label><input type="date" id="op-start"></div>
+        <div class="field"><label>Einddatum</label><input type="date" id="op-eind"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Koppeling aan ontwikkellijn</label>
+          <select id="op-lijn">
+            <option value="">— geen specifieke —</option>
+            <option value="norm">01 Norm uitspreken</option>
+            <option value="sensitiviteit">02 Bestuurlijke sensitiviteit</option>
+            <option value="dosering">03 Dosering</option>
+            <option value="zorg">Drijfveer Zorg</option>
+            <option value="meerdere">Meerdere / overstijgend</option>
+            <option value="vakinhoud">Vakinhoudelijk (2e lijn)</option>
+          </select>
+        </div>
+        <div class="field"><label>Doorlooptijd / studielast</label><input type="text" id="op-doorloop" placeholder="Bijv. 6 dagen verspreid over 3 maanden"></div>
+      </div>
+      <div class="field"><label>Doel: wat moet dit me opleveren?</label><textarea id="op-doel" rows="2" placeholder="Wat is het concrete leerdoel? Hoe verbindt dit met je MD-traject?"></textarea></div>
+      <div class="field"><label>Inzichten / wat het toevoegt (vul achteraf in)</label><textarea id="op-inzichten" rows="3" placeholder="Welke concepten/modellen neem je mee? Welke gedragsverandering?"></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-primary" onclick="saveOpleiding()">Opslaan</button>
+        <button class="btn btn-ghost" onclick="closeOpleidingForm()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">Filter status:</span>
+    <button class="filter-chip active" data-opl-status="all" onclick="filterOpleidingen('all')">Alle</button>
+    <button class="filter-chip" data-opl-status="gepland" onclick="filterOpleidingen('gepland')">Gepland</button>
+    <button class="filter-chip" data-opl-status="bezig" onclick="filterOpleidingen('bezig')">Bezig</button>
+    <button class="filter-chip" data-opl-status="afgerond" onclick="filterOpleidingen('afgerond')">Afgerond</button>
+  </div>
+
+  <div id="opleiding-list"></div>
+
+  <div class="ai-section">
+    <h3>AI-analyse — wat heb je echt geleerd?</h3>
+    <p class="ai-sub">Op basis van je opleidingen, ingevulde inzichten en (indien aanwezig) tekst uit hand-outs: welke rode draad zit erin? Welke leerdoelen worden goed afgedekt, welke ontwikkellijn krijgt nog te weinig formele leerstof?</p>
+    <button class="btn btn-primary" onclick="runAIOpleidingen()">◆ Analyseer leerportefeuille</button>
+    <div class="ai-output" id="ai-out-opleidingen" style="display:none"></div>
+  </div>
+</section>
+
+<!-- 08 LEESLIJST -->
+<section class="panel" id="panel-leeslijst">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Leeslijst <em>in opbouw</em></h1>
+      <p class="panel-sub">Wat heb je gelezen, en — belangrijker — wat heeft het toegevoegd?</p>
+    </div>
+    <button class="btn btn-primary" onclick="openLeesForm()">+ Boek toevoegen</button>
+  </div>
+
+  <div id="lees-form" style="display:none">
+    <div class="card moss-edge">
+      <div class="card-title" id="lees-form-title">Nieuw boek / artikel</div>
+      <div class="form-row">
+        <div class="field"><label>Titel</label><input type="text" id="l-titel"></div>
+        <div class="field"><label>Auteur(s)</label><input type="text" id="l-auteur"></div>
+      </div>
+      <div class="form-row three">
+        <div class="field"><label>Status</label>
+          <select id="l-status">
+            <option value="te-lezen">Nog te lezen</option>
+            <option value="bezig">Bezig</option>
+            <option value="gelezen">Gelezen</option>
+            <option value="geparkeerd">Geparkeerd</option>
+          </select>
+        </div>
+        <div class="field"><label>Thema</label>
+          <select id="l-thema">
+            <option value="leiderschap">Leiderschap algemeen</option>
+            <option value="adaptief">Adaptive leadership</option>
+            <option value="publiek">Publieke sector</option>
+            <option value="dosering">Dosering</option>
+            <option value="strategie">Strategie</option>
+            <option value="zelfinzicht">Zelfinzicht</option>
+            <option value="cliftonstrengths">CliftonStrengths</option>
+            <option value="anders">Anders</option>
+          </select>
+        </div>
+        <div class="field"><label>Datum</label><input type="date" id="l-datum"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Koppeling aan ontwikkellijn</label>
+          <select id="l-lijn">
+            <option value="">— geen specifieke —</option>
+            <option value="norm">01 Norm uitspreken</option>
+            <option value="sensitiviteit">02 Bestuurlijke sensitiviteit</option>
+            <option value="dosering">03 Dosering</option>
+            <option value="zorg">Drijfveer Zorg</option>
+            <option value="meerdere">Meerdere / overstijgend</option>
+          </select>
+        </div>
+        <div class="field"><label>Koppeling aan rol</label>
+          <select id="l-rol">
+            <option value="">— geen —</option>
+            <option value="leidinggevende">Leidinggevende</option>
+            <option value="sponsor">Sponsor</option>
+            <option value="md_adviseur">MD-adviseur</option>
+            <option value="begeleider">Begeleider</option>
+            <option value="peer">Peer</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Kerninzicht in één zin</label><input type="text" id="l-kern"></div>
+      <div class="field"><label>Wat heeft het toegevoegd?</label><textarea id="l-toegevoegd" rows="3"></textarea></div>
+      <div class="field"><label>Concrete actie / experiment</label><textarea id="l-actie" rows="2"></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-primary" onclick="saveLees()">Opslaan</button>
+        <button class="btn btn-ghost" onclick="closeLeesForm()">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="lees-list" class="entry-list" style="margin-top:18px"></div>
+
+  <div class="ai-section">
+    <h3>AI-aanbevelingen</h3>
+    <button class="btn btn-primary" onclick="runAILeeslijst()">◆ Vraag aanbevelingen</button>
+    <div class="ai-output" id="ai-out-lees" style="display:none"></div>
+  </div>
+</section>
+
+<!-- 09 MATCH -->
+<section class="panel" id="panel-match">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Vacature­<em>match</em></h1>
+      <p class="panel-sub">Upload of plak een vacaturetekst. Claude analyseert hem tegen je assessmentprofiel, ontwikkellijnen, opleidingen en eerdere ervaringen — en geeft een eerlijk matchprofiel: scoringskansen, blinde vlekken, gespreksstrategie.</p>
+    </div>
+  </div>
+
+  <div class="match-input-card">
+    <div class="match-tab-toggle">
+      <button class="active" data-mode="paste" onclick="switchMatchMode('paste')">Tekst plakken</button>
+      <button data-mode="upload" onclick="switchMatchMode('upload')">PDF / DOCX uploaden</button>
+    </div>
+
+    <div id="match-paste-mode">
+      <div class="field">
+        <label>Functietitel</label>
+        <input type="text" id="m-functietitel" placeholder="Bijv. Manager Control &amp; Risk (tweede echelon)">
+      </div>
+      <div class="field">
+        <label>Organisatie</label>
+        <input type="text" id="m-organisatie" placeholder="Bijv. UWV, ministerie van X, gemeente Y, Belastingdienst">
+      </div>
+      <div class="field">
+        <label>Vacaturetekst (plak hier de volledige tekst)</label>
+        <textarea id="m-tekst" rows="10" placeholder="Plak de volledige vacaturetekst: functieomschrijving, kerntaken, gevraagd profiel, competenties, arbeidsvoorwaarden..."></textarea>
+      </div>
+    </div>
+
+    <div id="match-upload-mode" style="display:none">
+      <div class="field">
+        <label>Functietitel</label>
+        <input type="text" id="m-functietitel-up" placeholder="Bijv. Manager Control &amp; Risk">
+      </div>
+      <div class="field">
+        <label>Organisatie</label>
+        <input type="text" id="m-organisatie-up" placeholder="Naam van organisatie">
+      </div>
+      <input type="file" id="m-file" accept=".pdf,.docx,.txt" style="display:none" onchange="handleVacatureUpload(event)">
+      <div class="drop-zone" onclick="document.getElementById('m-file').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault();this.classList.remove('dragover');if(event.dataTransfer.files.length){document.getElementById('m-file').files=event.dataTransfer.files;handleVacatureUpload({target:{files:event.dataTransfer.files}});}">
+        ↑ Klik of sleep vacaturebestand hierheen (PDF, DOCX of TXT)
+      </div>
+      <div id="m-upload-status" style="margin-top:12px; font-size:12px; color:var(--slate)"></div>
+      <div id="m-extract-preview" style="display:none"></div>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:18px; align-items:center; flex-wrap: wrap;">
+      <button class="btn btn-primary" onclick="runMatchAnalyse()" id="btn-match">◆ Analyseer match</button>
+      <button class="btn" onclick="clearMatchForm()">Leegmaken</button>
+      <span style="font-size:12px; color:var(--slate); margin-left: 10px;">Tip: hoe volledig de vacaturetekst, hoe scherper de analyse.</span>
+    </div>
+  </div>
+
+  <div id="match-result" style="display:none">
+    <div class="ai-output" id="ai-out-match"></div>
+  </div>
+
+  <div class="ornament">⸻ ◆ ⸻</div>
+
+  <h2 style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 400; margin-bottom: 8px;">Eerdere <em style="color: var(--gold-bright); font-style: italic;">analyses</em></h2>
+  <p class="panel-sub" style="margin-bottom: 18px;">Bewaarde matchprofielen. Handig om profielen te vergelijken of analyses van een paar maanden geleden opnieuw te lezen.</p>
+  <div id="match-history" class="match-history-list"></div>
+</section>
+
+<!-- 10 ASSESSMENT -->
+<section class="panel" id="panel-assessment">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Assessment­<em>inzichten</em></h1>
+      <p class="panel-sub">Vast referentiekader voor alle AI-modules.</p>
+    </div>
+  </div>
+
+  <div class="assessment-block">
+    <h4>CliftonStrengths — Top 5</h4>
+    <p>Woo · Positivisme · Individualisering · Communicatie · Organisatievermogen.</p>
+  </div>
+  <div class="assessment-block">
+    <h4>CliftonStrengths — Bottom 5 (34)</h4>
+    <p>Behoedzaamheid · Sturingskracht · Significantie onderaan. Strategisch, Analytisch, Intellect buiten bovenste helft.</p>
+  </div>
+  <div class="assessment-block">
+    <h4>GITP Potential — drie ontwikkeldoelstellingen</h4>
+    <p>(1) Eerder positie innemen · (2) Bestuurlijke sensitiviteit · (3) Focus &amp; dosering. Drijfveren: Team · Rechtvaardigheid · Zorg.</p>
+  </div>
+  <div class="assessment-block">
+    <h4>Eigen rode draad</h4>
+    <p class="quote">"Doseren is een valkuil voor mij, omdat presteren belangrijk is."</p>
+    <p>Doseren is geen techniekprobleem maar een overtuigingsprobleem.</p>
+  </div>
+  <div class="assessment-block">
+    <h4>Aangrijpingspunt voor zwaardere rol</h4>
+    <p>Drijfveer Zorg moet anders vormgegeven worden — via systemen en leidinggevenden i.p.v. zelf dragen. Ambitie: van terugblikkende naar voorspellende sturing bij UWV.</p>
+  </div>
+
+  <div class="field" style="margin-top:24px">
+    <label>Eigen aanvullingen / nuances</label>
+    <textarea id="a-eigen" rows="5"></textarea>
+    <button class="btn btn-sm" style="margin-top:8px" onclick="saveAssessment()">Bewaar</button>
+  </div>
+</section>
+
+<!-- 09 INSTELLINGEN -->
+<section class="panel" id="panel-instellingen">
+  <div class="panel-header">
+    <div>
+      <h1 class="panel-title">Instellingen &amp; <em>AI</em></h1>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <div class="card-title">Anthropic API</div>
+    <p style="color: var(--paper-dim); font-size: 13px; margin: 8px 0 16px;">
+      Je API-key wordt alleen lokaal in je browser opgeslagen. Aanmaken via console.anthropic.com.
+    </p>
+    <div class="form-row">
+      <div class="field"><label>API-key</label><input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off"></div>
+      <div class="field"><label>Model</label>
+        <select id="api-model">
+          <option value="claude-opus-4-5">Claude Opus 4.5 (diepste analyse)</option>
+          <option value="claude-sonnet-4-5" selected>Claude Sonnet 4.5 (snel, scherp)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveAPI()">Bewaar instellingen</button>
+    <span id="api-status" style="margin-left:12px;font-size:12px;color:var(--slate);"></span>
+    <div class="warn">
+      <strong>Privacy.</strong> Vervang namen door rollen ("directeur X" → "directeur"). Elk AI-verzoek bevat je actuele data.
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <div class="card-title">Data &amp; export</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="exportJSON()">↓ Download JSON-backup</button>
+      <button class="btn" onclick="document.getElementById('importFile').click()">↑ Importeer JSON</button>
+      <button class="btn btn-danger" onclick="clearAll()">⨯ Alles wissen</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer-hint">◆ <em>Norm eerst uitspreken — dan handelen.</em> ◆</div>
+
+<script>
+// ============ STATE ============
+const STORAGE_KEY = 'md_traject_v2';
+
+const DEFAULT_ROLES = {
+  leidinggevende: {
+    type: 'Leidinggevende',
+    purpose: 'Formele opdrachtgever van het MD-traject. Beoordeelt voortgang vanuit bedrijfsbelang. Eerste toetssteen voor positie-innemen.',
+    persoon: '',
+    cadans: 'Maandelijks 1-op-1',
+    verwachting: '',
+    signalen: '',
+    notities: ''
+  },
+  sponsor: {
+    type: 'Sponsor',
+    purpose: 'Voorwaardenscheppend, niet beoordelend. Maakt zichtbaarheid en doorgroei mogelijk. Vaak tweede echelon zelf.',
+    persoon: '',
+    cadans: 'Per kwartaal',
+    verwachting: '',
+    signalen: '',
+    notities: ''
+  },
+  md_adviseur: {
+    type: 'MD-adviseur',
+    purpose: 'Vanuit HR/MD. Bewaakt trajectkader, instrumenten en deliverables. Procesblik op je ontwikkeling.',
+    persoon: '',
+    cadans: 'Per fase',
+    verwachting: '',
+    signalen: '',
+    notities: ''
+  },
+  begeleider: {
+    type: 'Begeleider / coach',
+    purpose: 'Persoonlijke ontwikkeling, dieper dan inhoudelijk. Spiegelt patronen. Werkthema-eigenaar.',
+    persoon: '',
+    cadans: 'Maandelijks',
+    verwachting: '',
+    signalen: '',
+    notities: ''
+  }
+};
+
+let state = {
+  ontwikkel: [],
+  spanning: [],
+  lees: [],
+  sparring: [],
+  afspraken: [],
+  acties: [],
+  opleidingen: [],
+  matches: [],
+  rollen: JSON.parse(JSON.stringify(DEFAULT_ROLES)),
+  assessmentExtra: '',
+  api: { key: '', model: 'claude-sonnet-4-5' }
+};
+
+let scoreNorm = null;
+let scoreSpanningTracker = null;
+let scoreSpanning = null;
+let filterRol = 'all';
+let filterActieStatus = 'all';
+let filterActieRol = 'all';
+let filterOplStatus = 'all';
+
+// ============ LOAD/SAVE ============
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      state = { ...state, ...parsed };
+      // Migratie: zorg dat alle arrays bestaan
+      if (!Array.isArray(state.opleidingen)) state.opleidingen = [];
+      if (!Array.isArray(state.afspraken)) state.afspraken = [];
+      if (!Array.isArray(state.acties)) state.acties = [];
+      if (!Array.isArray(state.matches)) state.matches = [];
+      if (!Array.isArray(state.ontwikkel)) state.ontwikkel = [];
+      if (!Array.isArray(state.spanning)) state.spanning = [];
+      if (!Array.isArray(state.lees)) state.lees = [];
+      if (!Array.isArray(state.sparring)) state.sparring = [];
+      // Merge default roles if missing
+      Object.keys(DEFAULT_ROLES).forEach(k => {
+        if (!state.rollen[k]) state.rollen[k] = JSON.parse(JSON.stringify(DEFAULT_ROLES[k]));
+        else {
+          state.rollen[k].type = DEFAULT_ROLES[k].type;
+          state.rollen[k].purpose = DEFAULT_ROLES[k].purpose;
+        }
+      });
+    } catch(e) { console.error(e); }
+  }
+  document.getElementById('api-key').value = state.api?.key || '';
+  document.getElementById('api-model').value = state.api?.model || 'claude-sonnet-4-5';
+  document.getElementById('a-eigen').value = state.assessmentExtra || '';
+  render();
+}
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.error('Opslag mislukte:', e);
+    alert('⚠ Kon niet opslaan. Mogelijk is de opslag vol (limiet ~5MB). Verwijder zware bestanden in tab Opleidingen, of exporteer eerst je JSON-backup voor je doorgaat.');
+  }
+  render();
+}
+
+// ============ TABS ============
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => switchTab(t.dataset.tab));
+});
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============ SCORE PILLS ============
+function bindScorePills(elId, setter) {
+  document.querySelectorAll('#' + elId + ' button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#' + elId + ' button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      setter(b.dataset.val);
+    });
+  });
+}
+bindScorePills('score-norm', v => scoreNorm = v);
+bindScorePills('score-spanning-tracker', v => scoreSpanningTracker = v);
+bindScorePills('score-spanning', v => scoreSpanning = v);
+function resetScorePill(elId) {
+  document.querySelectorAll('#' + elId + ' button').forEach(x => x.classList.remove('active'));
+}
+
+// Helper: update form title naar bewerk-modus of nieuw
+function setFormTitle(titleId, isEditing, editText, newText) {
+  const el = document.getElementById(titleId);
+  if (el) el.textContent = isEditing ? editText : newText;
+}
+
+// ============ ONTWIKKELLIJNEN ============
+function openOntwikkelForm() {
+  document.getElementById('ontwikkel-form').style.display = 'block';
+  document.getElementById('o-datum').value = new Date().toISOString().slice(0,10);
+}
+function closeOntwikkelForm() {
+  document.getElementById('ontwikkel-form').style.display = 'none';
+  setFormTitle('ontwikkel-form-title', false, '', 'Nieuwe registratie');
+  ['o-datum','o-context','o-norm-vooraf','o-norm-feitelijk','o-stake-belangen','o-stake-timing','o-dos-aantal','o-dos-reflectie'].forEach(id => document.getElementById(id).value = '');
+  resetScorePill('score-norm'); resetScorePill('score-spanning-tracker');
+  scoreNorm = null; scoreSpanningTracker = null;
+  document.getElementById('ontwikkel-form').dataset.editing = '';
+}
+function editOntwikkel(id) {
+  const e = state.ontwikkel.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('ontwikkel-form').style.display = 'block';
+  document.getElementById('ontwikkel-form').dataset.editing = id;
+  setFormTitle('ontwikkel-form-title', true, 'Registratie bewerken', 'Nieuwe registratie');
+  document.getElementById('o-datum').value = e.datum || '';
+  document.getElementById('o-context').value = e.context || '';
+  document.getElementById('o-norm-vooraf').value = e.norm?.vooraf || '';
+  document.getElementById('o-norm-feitelijk').value = e.norm?.feitelijk || '';
+  document.getElementById('o-stake-belangen').value = e.stakeholder?.belangen || '';
+  document.getElementById('o-stake-timing').value = e.stakeholder?.timing || '';
+  document.getElementById('o-dos-aantal').value = e.dosering?.lopend || '';
+  document.getElementById('o-dos-reflectie').value = e.dosering?.reflectie || '';
+  // Activeer score pills
+  scoreNorm = e.norm?.score || null;
+  scoreSpanningTracker = e.dosering?.spanning || null;
+  resetScorePill('score-norm');
+  resetScorePill('score-spanning-tracker');
+  if (scoreNorm) {
+    const b = document.querySelector(`#score-norm button[data-val="${scoreNorm}"]`);
+    if (b) b.classList.add('active');
+  }
+  if (scoreSpanningTracker != null) {
+    const b = document.querySelector(`#score-spanning-tracker button[data-val="${scoreSpanningTracker}"]`);
+    if (b) b.classList.add('active');
+  }
+  document.getElementById('ontwikkel-form').scrollIntoView({ behavior: 'smooth' });
+}
+function saveOntwikkel() {
+  const editingId = document.getElementById('ontwikkel-form').dataset.editing;
+  const data = {
+    datum: document.getElementById('o-datum').value,
+    context: document.getElementById('o-context').value,
+    norm: { score: scoreNorm, vooraf: document.getElementById('o-norm-vooraf').value, feitelijk: document.getElementById('o-norm-feitelijk').value },
+    stakeholder: { belangen: document.getElementById('o-stake-belangen').value, timing: document.getElementById('o-stake-timing').value },
+    dosering: { spanning: scoreSpanningTracker, lopend: document.getElementById('o-dos-aantal').value, reflectie: document.getElementById('o-dos-reflectie').value }
+  };
+  if (editingId) {
+    const existing = state.ontwikkel.find(x => x.id == editingId);
+    if (existing) Object.assign(existing, data);
+  } else {
+    state.ontwikkel.unshift({ id: Date.now(), ...data });
+  }
+  persist();
+  closeOntwikkelForm();
+}
+function deleteOntwikkel(id) {
+  if (!confirm('Verwijderen?')) return;
+  state.ontwikkel = state.ontwikkel.filter(e => e.id !== id);
+  persist();
+}
+
+// ============ SPANNING ============
+function openSpanningForm() {
+  document.getElementById('spanning-form').style.display = 'block';
+  document.getElementById('s-datum').value = new Date().toISOString().slice(0,10);
+}
+function closeSpanningForm() {
+  document.getElementById('spanning-form').style.display = 'none';
+  setFormTitle('spanning-form-title', false, '', 'Spanningslog');
+  ['s-datum','s-context','s-gedrag','s-overtuiging','s-alternatief','s-werkte'].forEach(id => document.getElementById(id).value = '');
+  resetScorePill('score-spanning'); scoreSpanning = null;
+  document.getElementById('spanning-form').dataset.editing = '';
+}
+function editSpanning(id) {
+  const e = state.spanning.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('spanning-form').style.display = 'block';
+  document.getElementById('spanning-form').dataset.editing = id;
+  setFormTitle('spanning-form-title', true, 'Spanningslog bewerken', 'Spanningslog');
+  document.getElementById('s-datum').value = e.datum || '';
+  document.getElementById('s-context').value = e.context || '';
+  document.getElementById('s-gedrag').value = e.gedrag || '';
+  document.getElementById('s-overtuiging').value = e.overtuiging || '';
+  document.getElementById('s-werkte').value = e.werkte || '';
+  document.getElementById('s-alternatief').value = e.alternatief || '';
+  scoreSpanning = e.niveau;
+  resetScorePill('score-spanning');
+  if (scoreSpanning != null) {
+    const b = document.querySelector(`#score-spanning button[data-val="${scoreSpanning}"]`);
+    if (b) b.classList.add('active');
+  }
+  document.getElementById('spanning-form').scrollIntoView({ behavior: 'smooth' });
+}
+function saveSpanning() {
+  const editingId = document.getElementById('spanning-form').dataset.editing;
+  const data = {
+    datum: document.getElementById('s-datum').value,
+    context: document.getElementById('s-context').value,
+    niveau: scoreSpanning,
+    gedrag: document.getElementById('s-gedrag').value,
+    overtuiging: document.getElementById('s-overtuiging').value,
+    werkte: document.getElementById('s-werkte').value,
+    alternatief: document.getElementById('s-alternatief').value
+  };
+  if (editingId) {
+    const existing = state.spanning.find(x => x.id == editingId);
+    if (existing) Object.assign(existing, data);
+  } else {
+    state.spanning.unshift({ id: Date.now(), ...data });
+  }
+  persist();
+  closeSpanningForm();
+}
+function deleteSpanning(id) {
+  if (!confirm('Verwijderen?')) return;
+  state.spanning = state.spanning.filter(e => e.id !== id);
+  persist();
+}
+
+// ============ LEESLIJST ============
+function openLeesForm() {
+  document.getElementById('lees-form').style.display = 'block';
+  if (!document.getElementById('l-datum').value) document.getElementById('l-datum').value = new Date().toISOString().slice(0,10);
+}
+function closeLeesForm() {
+  document.getElementById('lees-form').style.display = 'none';
+  setFormTitle('lees-form-title', false, '', 'Nieuw boek / artikel');
+  ['l-titel','l-auteur','l-datum','l-kern','l-toegevoegd','l-actie','l-lijn','l-rol'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  document.getElementById('lees-form').dataset.editing = '';
+}
+function editLees(id) {
+  const e = state.lees.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('lees-form').style.display = 'block';
+  document.getElementById('lees-form').dataset.editing = id;
+  setFormTitle('lees-form-title', true, 'Boek bewerken', 'Nieuw boek / artikel');
+  document.getElementById('l-titel').value = e.titel || '';
+  document.getElementById('l-auteur').value = e.auteur || '';
+  document.getElementById('l-status').value = e.status || 'te-lezen';
+  document.getElementById('l-thema').value = e.thema || 'leiderschap';
+  document.getElementById('l-lijn').value = e.lijn || '';
+  document.getElementById('l-rol').value = e.rol || '';
+  document.getElementById('l-datum').value = e.datum || '';
+  document.getElementById('l-kern').value = e.kern || '';
+  document.getElementById('l-toegevoegd').value = e.toegevoegd || '';
+  document.getElementById('l-actie').value = e.actie || '';
+  document.getElementById('lees-form').scrollIntoView({ behavior: 'smooth' });
+}
+function saveLees() {
+  const editingId = document.getElementById('lees-form').dataset.editing;
+  const data = {
+    titel: document.getElementById('l-titel').value,
+    auteur: document.getElementById('l-auteur').value,
+    status: document.getElementById('l-status').value,
+    thema: document.getElementById('l-thema').value,
+    lijn: document.getElementById('l-lijn').value,
+    rol: document.getElementById('l-rol').value,
+    datum: document.getElementById('l-datum').value,
+    kern: document.getElementById('l-kern').value,
+    toegevoegd: document.getElementById('l-toegevoegd').value,
+    actie: document.getElementById('l-actie').value
+  };
+  if (editingId) {
+    const existing = state.lees.find(x => x.id == editingId);
+    if (existing) Object.assign(existing, data);
+  } else {
+    state.lees.unshift({ id: Date.now(), ...data });
+  }
+  persist();
+  closeLeesForm();
+}
+function deleteLees(id) {
+  if (!confirm('Verwijderen?')) return;
+  state.lees = state.lees.filter(e => e.id !== id);
+  persist();
+}
+
+// ============ OPLEIDINGEN ============
+function openOpleidingForm() {
+  document.getElementById('opleiding-form').style.display = 'block';
+  if (!document.getElementById('op-start').value) document.getElementById('op-start').value = new Date().toISOString().slice(0,10);
+}
+function closeOpleidingForm() {
+  document.getElementById('opleiding-form').style.display = 'none';
+  setFormTitle('opleiding-form-title', false, '', 'Opleiding / training');
+  ['op-titel','op-aanbieder','op-status','op-type','op-start','op-eind','op-lijn','op-doorloop','op-doel','op-inzichten'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  // verwijder editing-marker als die er was
+  document.getElementById('opleiding-form').dataset.editing = '';
+}
+function saveOpleiding() {
+  const editingId = document.getElementById('opleiding-form').dataset.editing;
+  const data = {
+    titel: document.getElementById('op-titel').value,
+    aanbieder: document.getElementById('op-aanbieder').value,
+    status: document.getElementById('op-status').value,
+    type: document.getElementById('op-type').value,
+    start: document.getElementById('op-start').value,
+    eind: document.getElementById('op-eind').value,
+    lijn: document.getElementById('op-lijn').value,
+    doorloop: document.getElementById('op-doorloop').value,
+    doel: document.getElementById('op-doel').value,
+    inzichten: document.getElementById('op-inzichten').value
+  };
+  if (editingId) {
+    const existing = state.opleidingen.find(o => o.id == editingId);
+    if (existing) Object.assign(existing, data);
+  } else {
+    state.opleidingen.unshift({ id: Date.now(), ...data, uploads: [] });
+  }
+  persist();
+  closeOpleidingForm();
+}
+function editOpleiding(id) {
+  const o = state.opleidingen.find(e => e.id === id);
+  if (!o) return;
+  openOpleidingForm();
+  document.getElementById('opleiding-form').dataset.editing = id;
+  setFormTitle('opleiding-form-title', true, 'Opleiding bewerken', 'Opleiding / training');
+  document.getElementById('op-titel').value = o.titel || '';
+  document.getElementById('op-aanbieder').value = o.aanbieder || '';
+  document.getElementById('op-status').value = o.status || 'gepland';
+  document.getElementById('op-type').value = o.type || 'opleiding';
+  document.getElementById('op-start').value = o.start || '';
+  document.getElementById('op-eind').value = o.eind || '';
+  document.getElementById('op-lijn').value = o.lijn || '';
+  document.getElementById('op-doorloop').value = o.doorloop || '';
+  document.getElementById('op-doel').value = o.doel || '';
+  document.getElementById('op-inzichten').value = o.inzichten || '';
+  document.getElementById('opleiding-form').scrollIntoView({ behavior: 'smooth' });
+}
+function deleteOpleiding(id) {
+  const o = state.opleidingen.find(e => e.id === id);
+  const fileCount = o?.uploads?.length || 0;
+  if (!confirm(`Opleiding verwijderen${fileCount ? ' (inclusief ' + fileCount + ' bestand(en))' : ''}?`)) return;
+  state.opleidingen = state.opleidingen.filter(e => e.id !== id);
+  persist();
+}
+function filterOpleidingen(status) {
+  filterOplStatus = status;
+  document.querySelectorAll('.filter-chip[data-opl-status]').forEach(c => c.classList.toggle('active', c.dataset.oplStatus === status));
+  renderOpleidingen();
+}
+
+// === FILE UPLOAD ===
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB per bestand
+function handleFileUpload(opleidingId, files) {
+  const o = state.opleidingen.find(e => e.id === opleidingId);
+  if (!o) return;
+  if (!o.uploads) o.uploads = [];
+
+  const fileList = Array.from(files);
+  let processed = 0;
+  fileList.forEach(file => {
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`Bestand "${file.name}" is te groot (${formatBytes(file.size)}). Max 5 MB per bestand. Tip: comprimeer de PDF eerst.`);
+      processed++;
+      if (processed === fileList.length) persist();
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      o.uploads.push({
+        id: Date.now() + Math.random(),
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        added: new Date().toISOString().slice(0,10),
+        data: e.target.result // base64 data URL
+      });
+      processed++;
+      if (processed === fileList.length) {
+        try { persist(); }
+        catch (err) {
+          alert('Opslaglimiet bereikt. Verwijder oudere bestanden of exporteer eerst je JSON-backup.');
+          // Rollback laatste toevoeging
+          o.uploads.pop();
+          persist();
+        }
+      }
+    };
+    reader.onerror = () => {
+      alert(`Bestand "${file.name}" kon niet worden gelezen.`);
+      processed++;
+      if (processed === fileList.length) persist();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function downloadUpload(opleidingId, uploadId) {
+  const o = state.opleidingen.find(e => e.id === opleidingId);
+  if (!o) return;
+  const u = o.uploads.find(x => x.id === uploadId);
+  if (!u) return;
+  const a = document.createElement('a');
+  a.href = u.data;
+  a.download = u.name;
+  a.click();
+}
+function deleteUpload(opleidingId, uploadId) {
+  const o = state.opleidingen.find(e => e.id === opleidingId);
+  if (!o || !o.uploads) return;
+  const u = o.uploads.find(x => x.id === uploadId);
+  if (!u) return;
+  if (!confirm(`Bestand "${u.name}" verwijderen?`)) return;
+  o.uploads = o.uploads.filter(x => x.id !== uploadId);
+  persist();
+}
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(2) + ' MB';
+}
+function getStorageUsage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY) || '';
+    return raw.length; // benadering, base64 in UTF-16
+  } catch { return 0; }
+}
+function triggerFileInput(opleidingId) {
+  const input = document.getElementById('fileInput-' + opleidingId);
+  if (input) input.click();
+}
+function handleDragOver(e, opleidingId) {
+  e.preventDefault();
+  e.currentTarget.classList.add('dragover');
+}
+function handleDragLeave(e) {
+  e.currentTarget.classList.remove('dragover');
+}
+function handleDrop(e, opleidingId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleFileUpload(opleidingId, e.dataTransfer.files);
+}
+
+// ============ SPARRING ============
+function openSparringForm() {
+  document.getElementById('sparring-form').style.display = 'block';
+  document.getElementById('sp-datum').value = new Date().toISOString().slice(0,10);
+}
+function closeSparringForm() {
+  document.getElementById('sparring-form').style.display = 'none';
+  setFormTitle('sparring-form-title', false, '', 'Gespreksvoorbereiding / nabewerking');
+  ['sp-datum','sp-partner','sp-rol','sp-vraag','sp-lijn','sp-inzicht','sp-actie'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('sparring-form').dataset.editing = '';
+}
+function editSparring(id) {
+  const e = state.sparring.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('sparring-form').style.display = 'block';
+  document.getElementById('sparring-form').dataset.editing = id;
+  setFormTitle('sparring-form-title', true, 'Gesprek bewerken', 'Gespreksvoorbereiding / nabewerking');
+  document.getElementById('sp-datum').value = e.datum || '';
+  document.getElementById('sp-partner').value = e.partner || '';
+  document.getElementById('sp-rol').value = e.rol || '';
+  document.getElementById('sp-vraag').value = e.vraag || '';
+  document.getElementById('sp-lijn').value = e.lijn || '';
+  document.getElementById('sp-inzicht').value = e.inzicht || '';
+  document.getElementById('sp-actie').value = e.actie || '';
+  document.getElementById('sparring-form').scrollIntoView({ behavior: 'smooth' });
+}
+function saveSparring() {
+  const editingId = document.getElementById('sparring-form').dataset.editing;
+  const data = {
+    datum: document.getElementById('sp-datum').value,
+    partner: document.getElementById('sp-partner').value,
+    rol: document.getElementById('sp-rol').value,
+    vraag: document.getElementById('sp-vraag').value,
+    lijn: document.getElementById('sp-lijn').value,
+    inzicht: document.getElementById('sp-inzicht').value,
+    actie: document.getElementById('sp-actie').value
+  };
+  if (editingId) {
+    const existing = state.sparring.find(x => x.id == editingId);
+    if (existing) Object.assign(existing, data);
+  } else {
+    state.sparring.unshift({ id: Date.now(), ...data });
+  }
+  persist();
+  closeSparringForm();
+}
+function deleteSparring(id) {
+  if (!confirm('Verwijderen?')) return;
+  state.sparring = state.sparring.filter(e => e.id !== id);
+  persist();
+}
+
+// ============ ASSESSMENT ============
+function saveAssessment() {
+  state.assessmentExtra = document.getElementById('a-eigen').value;
+  persist();
+  alert('Bewaard.');
+}
+
+// ============ ROLLEN ============
+function openRolForm() {
+  document.getElementById('rol-form').style.display = 'block';
+  const cont = document.getElementById('rol-form-fields');
+  cont.innerHTML = Object.entries(state.rollen).map(([key, r]) => `
+    <div style="margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line);">
+      <h3 style="font-family: 'Fraunces', serif; color: var(--gold-bright); font-size: 17px; margin-bottom: 12px;">${r.type}</h3>
+      <div class="form-row">
+        <div class="field"><label>Persoon (naam of rol)</label><input type="text" data-rol="${key}" data-veld="persoon" value="${escape(r.persoon)}"></div>
+        <div class="field"><label>Cadans</label><input type="text" data-rol="${key}" data-veld="cadans" value="${escape(r.cadans)}"></div>
+      </div>
+      <div class="field"><label>Verwachting / wat we hebben afgesproken</label><textarea data-rol="${key}" data-veld="verwachting" rows="2">${escape(r.verwachting)}</textarea></div>
+      <div class="field"><label>Signalen die ik wil bewaken</label><textarea data-rol="${key}" data-veld="signalen" rows="2">${escape(r.signalen)}</textarea></div>
+      <div class="field"><label>Eigen notities</label><textarea data-rol="${key}" data-veld="notities" rows="2">${escape(r.notities)}</textarea></div>
+    </div>
+  `).join('');
+}
+function closeRolForm() {
+  document.getElementById('rol-form').style.display = 'none';
+}
+function saveRollen() {
+  document.querySelectorAll('#rol-form-fields [data-rol]').forEach(el => {
+    const rol = el.dataset.rol;
+    const veld = el.dataset.veld;
+    state.rollen[rol][veld] = el.value;
+  });
+  persist();
+  closeRolForm();
+}
+
+// ============ AFSPRAKEN ============
+function openAfspraakForm() {
+  document.getElementById('afspraak-form').style.display = 'block';
+}
+function closeAfspraakForm() {
+  document.getElementById('afspraak-form').style.display = 'none';
+  setFormTitle('afspraak-form-title', false, '', 'Afspraak / cadans');
+  ['af-titel','af-rol','af-freq','af-volgend','af-status','af-doel','af-bewaak'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  document.getElementById('af-freq').value = 'maandelijks';
+  document.getElementById('afspraak-form').dataset.editing = '';
+}
+function editAfspraak(id) {
+  const e = state.afspraken.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('afspraak-form').style.display = 'block';
+  document.getElementById('afspraak-form').dataset.editing = id;
+  setFormTitle('afspraak-form-title', true, 'Afspraak bewerken', 'Afspraak / cadans');
+  document.getElementById('af-titel').value = e.titel || '';
+  document.getElementById('af-rol').value = e.rol || '';
+  document.getElementById('af-freq').value = e.freq || 'maandelijks';
+  document.getElementById('af-volgend').value = e.volgend || '';
+  document.getElementById('af-status').value = e.status || 'actief';
+  document.getElementById('af-doel').value = e.doel || '';
+  document.getElementById('af-bewaak').value = e.bewaak || '';
+  document.getElementById('afspraak-form').scrollIntoView({ behavior: 'smooth' });
+}
+function saveAfspraak() {
+  const editingId = document.getElementById('afspraak-form').dataset.editing;
+  const data = {
+    titel: document.getElementById('af-titel').value,
+    rol: document.getElementById('af-rol').value,
+    freq: document.getElementById('af-freq').value,
+    volgend: document.getElementById('af-volgend').value,
+    status: document.getElementById('af-status').value,
+    doel: document.getElementById('af-doel').value,
+    bewaak: document.getElementById('af-bewaak').value
+  };
+  if (editingId) {
+    const existing = state.afspraken.find(x => x.id == editingId);
+    if (existing) Object.assign(existing, data);
+  } else {
+    state.afspraken.unshift({ id: Date.now(), ...data });
+  }
+  persist();
+  closeAfspraakForm();
+}
+function deleteAfspraak(id) {
+  if (!confirm('Verwijderen?')) return;
+  state.afspraken = state.afspraken.filter(e => e.id !== id);
+  persist();
+}
+function filterAfspraken(rol) {
+  filterRol = rol;
+  document.querySelectorAll('.filter-chip[data-filter]').forEach(c => c.classList.toggle('active', c.dataset.filter === rol));
+  renderAfspraken();
+}
+
+// ============ ACTIES ============
+function openActieForm() {
+  document.getElementById('actie-form').style.display = 'block';
+}
+function closeActieForm() {
+  document.getElementById('actie-form').style.display = 'none';
+  setFormTitle('actie-form-title', false, '', 'Actie');
+  ['ac-titel','ac-deadline','ac-rol','ac-lijn','ac-status','ac-achtergrond','ac-dod'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  document.getElementById('actie-form').dataset.editing = '';
+}
+function editActie(id) {
+  const e = state.acties.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('actie-form').style.display = 'block';
+  document.getElementById('actie-form').dataset.editing = id;
+  setFormTitle('actie-form-title', true, 'Actie bewerken', 'Actie');
+  document.getElementById('ac-titel').value = e.titel || '';
+  document.getElementById('ac-deadline').value = e.deadline || '';
+  document.getElementById('ac-rol').value = e.rol || '';
+  document.getElementById('ac-lijn').value = e.lijn || '';
+  document.getElementById('ac-status').value = e.status || 'open';
+  document.getElementById('ac-achtergrond').value = e.achtergrond || '';
+  document.getElementById('ac-dod').value = e.dod || '';
+  document.getElementById('actie-form').scrollIntoView({ behavior: 'smooth' });
+}
+function saveActie() {
+  const editingId = document.getElementById('actie-form').dataset.editing;
+  const data = {
+    titel: document.getElementById('ac-titel').value,
+    deadline: document.getElementById('ac-deadline').value,
+    rol: document.getElementById('ac-rol').value,
+    lijn: document.getElementById('ac-lijn').value,
+    status: document.getElementById('ac-status').value,
+    achtergrond: document.getElementById('ac-achtergrond').value,
+    dod: document.getElementById('ac-dod').value
+  };
+  if (editingId) {
+    const existing = state.acties.find(x => x.id == editingId);
+    if (existing) Object.assign(existing, data);
+  } else {
+    state.acties.unshift({ id: Date.now(), ...data, aangemaakt: new Date().toISOString().slice(0,10) });
+  }
+  persist();
+  closeActieForm();
+}
+function deleteActie(id) {
+  if (!confirm('Verwijderen?')) return;
+  state.acties = state.acties.filter(e => e.id !== id);
+  persist();
+}
+function toggleActieStatus(id) {
+  const a = state.acties.find(x => x.id === id);
+  if (!a) return;
+  a.status = a.status === 'afgerond' ? 'open' : 'afgerond';
+  persist();
+}
+function filterActies(status, rol) {
+  if (status !== null) {
+    filterActieStatus = status;
+    document.querySelectorAll('.filter-chip[data-actief-status]').forEach(c => c.classList.toggle('active', c.dataset.actiefStatus === status));
+  }
+  if (rol !== null) {
+    filterActieRol = rol;
+    document.querySelectorAll('.filter-chip[data-actief-rol]').forEach(c => c.classList.toggle('active', c.dataset.actiefRol === rol));
+  }
+  renderActies();
+}
+
+// ============ API ============
+function saveAPI() {
+  state.api.key = document.getElementById('api-key').value.trim();
+  state.api.model = document.getElementById('api-model').value;
+  persist();
+  const s = document.getElementById('api-status');
+  s.textContent = state.api.key ? '✓ Bewaard' : '⨯ Geen key';
+  s.style.color = state.api.key ? 'var(--moss)' : 'var(--rust)';
+  setTimeout(() => s.textContent = '', 2500);
+}
+
+// ============ EXPORT/IMPORT ============
+function exportJSON() {
+  const data = { ...state, _exported: new Date().toISOString(), _version: 'md_traject_v2' };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'md_traject_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!confirm('Importeren overschrijft je huidige data. Doorgaan?')) { e.target.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      state = { ...state, ...data };
+      // Migratie: zorg dat alle arrays bestaan
+      if (!Array.isArray(state.opleidingen)) state.opleidingen = [];
+      if (!Array.isArray(state.afspraken)) state.afspraken = [];
+      if (!Array.isArray(state.acties)) state.acties = [];
+      if (!Array.isArray(state.matches)) state.matches = [];
+      if (!Array.isArray(state.ontwikkel)) state.ontwikkel = [];
+      if (!Array.isArray(state.spanning)) state.spanning = [];
+      if (!Array.isArray(state.lees)) state.lees = [];
+      if (!Array.isArray(state.sparring)) state.sparring = [];
+      Object.keys(DEFAULT_ROLES).forEach(k => {
+        if (!state.rollen[k]) state.rollen[k] = JSON.parse(JSON.stringify(DEFAULT_ROLES[k]));
+      });
+      persist();
+      document.getElementById('api-key').value = state.api?.key || '';
+      document.getElementById('a-eigen').value = state.assessmentExtra || '';
+      alert('Geïmporteerd.');
+    } catch (err) { alert('Bestand kon niet gelezen worden: ' + err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+function clearAll() {
+  if (!confirm('ALLE data wissen?')) return;
+  if (!confirm('Echt zeker?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+// ============ RENDER ============
+function render() {
+  // Defensieve initialisatie: zorg dat alle arrays/objecten bestaan
+  if (!Array.isArray(state.ontwikkel)) state.ontwikkel = [];
+  if (!Array.isArray(state.spanning)) state.spanning = [];
+  if (!Array.isArray(state.lees)) state.lees = [];
+  if (!Array.isArray(state.sparring)) state.sparring = [];
+  if (!Array.isArray(state.afspraken)) state.afspraken = [];
+  if (!Array.isArray(state.acties)) state.acties = [];
+  if (!Array.isArray(state.opleidingen)) state.opleidingen = [];
+  if (!Array.isArray(state.matches)) state.matches = [];
+  if (!state.rollen || typeof state.rollen !== 'object') state.rollen = JSON.parse(JSON.stringify(DEFAULT_ROLES));
+
+  // Metrics
+  document.getElementById('m-ontwikkel').innerHTML = state.ontwikkel.length + '<em>logs</em>';
+  document.getElementById('m-spanning').innerHTML = state.spanning.length + '<em>logs</em>';
+  const openActies = state.acties.filter(a => a.status !== 'afgerond' && a.status !== 'geparkeerd').length;
+  document.getElementById('m-acties').innerHTML = openActies + '<em>open</em>';
+  const today = new Date().toISOString().slice(0,10);
+  const komendeAfspraken = state.afspraken.filter(a => a.status === 'actief' || a.status === 'gepland').filter(a => !a.volgend || a.volgend >= today).length;
+  document.getElementById('m-afspraken').innerHTML = komendeAfspraken + '<em>komend</em>';
+
+  // Trends
+  if (state.ontwikkel.length > 0) {
+    const jas = state.ontwikkel.filter(e => e.norm?.score === 'ja').length;
+    const total = state.ontwikkel.filter(e => e.norm?.score && e.norm?.score !== 'nvt').length;
+    document.getElementById('m-ontwikkel-trend').textContent = total > 0 ? Math.round(jas/total*100) + '% norm op tafel' : '';
+  } else document.getElementById('m-ontwikkel-trend').textContent = 'Nog geen registraties';
+  if (state.spanning.length > 0) {
+    const recent = state.spanning.slice(0, 5);
+    const avg = recent.reduce((s,e) => s + (parseInt(e.niveau)||0), 0) / recent.length;
+    document.getElementById('m-spanning-trend').textContent = 'Gem. niveau (5): ' + avg.toFixed(1);
+  } else document.getElementById('m-spanning-trend').textContent = '—';
+  const overdue = state.acties.filter(a => a.deadline && a.deadline < today && a.status !== 'afgerond' && a.status !== 'geparkeerd').length;
+  document.getElementById('m-acties-trend').textContent = overdue > 0 ? overdue + ' over deadline' : 'op koers';
+  document.getElementById('m-acties-trend').style.color = overdue > 0 ? 'var(--rust)' : 'var(--moss)';
+  if (komendeAfspraken === 0 && state.afspraken.length > 0) {
+    document.getElementById('m-afspraken-trend').textContent = 'Plan volgend moment';
+    document.getElementById('m-afspraken-trend').style.color = 'var(--rust)';
+  } else document.getElementById('m-afspraken-trend').textContent = '—';
+
+  // Summary cards
+  if (state.ontwikkel.length > 0) {
+    const normJa = state.ontwikkel.filter(e => e.norm?.score === 'ja').length;
+    const normTotaal = state.ontwikkel.length;
+    document.getElementById('summary-norm').textContent = `${normJa}/${normTotaal} registraties met positie op tafel binnen 5 min. Laatste: ${state.ontwikkel[0].datum} — ${state.ontwikkel[0].context || '(geen context)'}.`;
+    const stakeOK = state.ontwikkel.filter(e => e.stakeholder?.belangen?.trim()).length;
+    document.getElementById('summary-stakeholder').textContent = `${stakeOK}/${normTotaal} registraties met expliciete belangenanalyse.`;
+    const niveaus = state.ontwikkel.map(e => parseInt(e.dosering?.spanning)).filter(n => !isNaN(n));
+    const avgN = niveaus.length ? (niveaus.reduce((s,n)=>s+n,0)/niveaus.length).toFixed(1) : '—';
+    document.getElementById('summary-dosering').textContent = `Gem. spanningsniveau bij overleggen: ${avgN}. Aantal logs: ${niveaus.length}.`;
+  }
+
+  renderOntwikkel();
+  renderSpanning();
+  renderLees();
+  renderSparring();
+  renderRollen();
+  renderAfspraken();
+  renderActies();
+  renderOpleidingen();
+  renderMatchHistory();
+  renderCharts();
+}
+
+function renderOntwikkel() {
+  const el = document.getElementById('ontwikkel-list');
+  if (!el) return;
+  if (!Array.isArray(state.ontwikkel)) state.ontwikkel = [];
+  if (state.ontwikkel.length === 0) { el.innerHTML = '<div class="empty">Nog geen registraties.</div>'; return; }
+  el.innerHTML = state.ontwikkel.map(e => {
+    const normTag = e.norm?.score === 'ja' ? '<span class="tag moss">norm: ja</span>' : e.norm?.score === 'nee' ? '<span class="tag rust">norm: nee</span>' : e.norm?.score ? `<span class="tag">norm: ${e.norm.score}</span>` : '';
+    const spanTag = e.dosering?.spanning ? `<span class="tag gold">spanning: ${e.dosering.spanning}</span>` : '';
+    return `<div class="entry-row">
+      <div class="entry-date">${formatDate(e.datum)}</div>
+      <div class="entry-main">
+        <div class="entry-h">${escape(e.context) || '(geen context)'}</div>
+        <div class="entry-d">${normTag}${spanTag} ${escape((e.norm?.feitelijk||'').slice(0,140))}${(e.norm?.feitelijk||'').length>140?'…':''}</div>
+      </div>
+      <div class="entry-actions">
+        <button class="icon-btn" onclick="editOntwikkel(${e.id})" title="Bewerken">✎</button>
+        <button class="icon-btn danger" onclick="deleteOntwikkel(${e.id})" title="Verwijderen">⨯</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderSpanning() {
+  const el = document.getElementById('spanning-list');
+  if (!el) return;
+  if (!Array.isArray(state.spanning)) state.spanning = [];
+  if (state.spanning.length === 0) { el.innerHTML = '<div class="empty">Nog geen logs.</div>'; return; }
+  el.innerHTML = state.spanning.map(e => {
+    const lvl = e.niveau != null ? `<span class="tag ${parseInt(e.niveau)>=4?'rust':parseInt(e.niveau)>=2?'gold':'moss'}">niv ${e.niveau}</span>` : '';
+    const w = e.werkte === 'voor' ? '<span class="tag moss">vóór mij</span>' : e.werkte === 'tegen' ? '<span class="tag rust">tegen mij</span>' : e.werkte === 'beide' ? '<span class="tag gold">beide</span>' : '';
+    return `<div class="entry-row">
+      <div class="entry-date">${formatDate(e.datum)}</div>
+      <div class="entry-main">
+        <div class="entry-h">${escape(e.context) || '(geen context)'}</div>
+        <div class="entry-d">${lvl}${w} <em style="color:var(--paper-dim);font-style:italic">"${escape((e.overtuiging||'').slice(0,120))}${(e.overtuiging||'').length>120?'…':''}"</em></div>
+      </div>
+      <div class="entry-actions">
+        <button class="icon-btn" onclick="editSpanning(${e.id})" title="Bewerken">✎</button>
+        <button class="icon-btn danger" onclick="deleteSpanning(${e.id})" title="Verwijderen">⨯</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderLees() {
+  const el = document.getElementById('lees-list');
+  if (!el) return;
+  if (!Array.isArray(state.lees)) state.lees = [];
+  if (state.lees.length === 0) { el.innerHTML = '<div class="empty">Leeslijst leeg. Vraag AI om aanbevelingen.</div>'; return; }
+  el.innerHTML = state.lees.map(e => {
+    const statusMap = { 'te-lezen': 'gold', 'bezig': 'gold', 'gelezen': 'moss', 'geparkeerd': 'rust' };
+    const lijnBadge = e.lijn ? `<span class="tag gold">${escape(e.lijn)}</span>` : '';
+    const rolBadge = e.rol ? `<span class="tag ${rolColorClass(e.rol)}">${formatRol(e.rol)}</span>` : '';
+    return `<div class="entry-row">
+      <div class="entry-date">${formatDate(e.datum)}</div>
+      <div class="entry-main">
+        <div class="entry-h">${escape(e.titel)} <span style="color:var(--slate);font-weight:normal"> · ${escape(e.auteur)}</span></div>
+        <div class="entry-d"><span class="tag ${statusMap[e.status]||''}">${e.status}</span><span class="tag">${e.thema}</span>${lijnBadge}${rolBadge} ${escape((e.kern||'').slice(0,100))}</div>
+      </div>
+      <div class="entry-actions">
+        <button class="icon-btn" onclick="editLees(${e.id})" title="Bewerken">✎</button>
+        <button class="icon-btn danger" onclick="deleteLees(${e.id})" title="Verwijderen">⨯</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderOpleidingen() {
+  const el = document.getElementById('opleiding-list');
+  if (!el) return;
+  let list = state.opleidingen || [];
+  if (filterOplStatus !== 'all') list = list.filter(o => o.status === filterOplStatus);
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty">Nog geen opleidingen of trainingen toegevoegd.</div>';
+    return;
+  }
+  // Sorteer: gepland eerst, daarna bezig, daarna afgerond
+  const orderMap = { 'bezig': 0, 'gepland': 1, 'afgerond': 2, 'geparkeerd': 3 };
+  list = [...list].sort((a,b) => (orderMap[a.status]||9) - (orderMap[b.status]||9));
+
+  el.innerHTML = list.map(o => {
+    const uploads = o.uploads || [];
+    const totalSize = uploads.reduce((s,u) => s + (u.size||0), 0);
+    const periode = (o.start || o.eind) ? `${o.start ? formatDate(o.start) : '?'} → ${o.eind ? formatDate(o.eind) : '?'}` : '';
+    return `<div class="opl-card ${o.status||''}">
+      <div class="opl-head">
+        <div>
+          <div class="opl-titel">${escape(o.titel||'(geen titel)')}</div>
+          <div class="opl-aanbieder">${escape(o.aanbieder||'')}</div>
+        </div>
+        <div style="display:flex;gap:4px;">
+          <span class="tag ${o.status==='afgerond'?'moss':o.status==='bezig'?'gold':o.status==='gepland'?'blue':''}">${o.status||'—'}</span>
+          <span class="tag">${o.type||'—'}</span>
+        </div>
+      </div>
+      <div class="opl-meta">
+        ${periode ? `<span><strong>Periode:</strong> ${periode}</span>` : ''}
+        ${o.doorloop ? `<span><strong>Doorloop:</strong> ${escape(o.doorloop)}</span>` : ''}
+        ${o.lijn ? `<span><strong>Ontwikkellijn:</strong> ${escape(o.lijn)}</span>` : ''}
+      </div>
+      ${o.doel ? `<div class="opl-doel"><em>Doel:</em> ${escape(o.doel)}</div>` : ''}
+      ${o.inzichten ? `<div class="opl-notitie"><strong>Inzichten:</strong> ${escape(o.inzichten)}</div>` : ''}
+
+      <div class="opl-uploads">
+        <div class="opl-uploads-title">Hand-outs &amp; materialen ${uploads.length ? `(${uploads.length} · ${formatBytes(totalSize)})` : ''}</div>
+        ${uploads.length ? `<div class="upload-list">
+          ${uploads.map(u => `<div class="upload-item">
+            <div class="u-name"><span class="u-icon">${getFileIcon(u.name, u.type)}</span>${escape(u.name)}<span class="u-size">${formatBytes(u.size)}</span></div>
+            <div class="u-actions">
+              <button class="icon-btn" onclick="downloadUpload(${o.id}, ${u.id})" title="Download">↓</button>
+              <button class="icon-btn danger" onclick="deleteUpload(${o.id}, ${u.id})" title="Verwijderen">⨯</button>
+            </div>
+          </div>`).join('')}
+        </div>` : ''}
+        <input type="file" id="fileInput-${o.id}" multiple style="display:none" onchange="handleFileUpload(${o.id}, this.files); this.value=''">
+        <div class="drop-zone" onclick="triggerFileInput(${o.id})" ondragover="handleDragOver(event, ${o.id})" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${o.id})">
+          ↑ Klik of sleep bestanden hierheen (PDF, DOCX, afbeeldingen — max 5 MB per bestand)
+        </div>
+      </div>
+
+      <div class="opl-actions-bar">
+        <button class="btn btn-sm" onclick="editOpleiding(${o.id})">Bewerken</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteOpleiding(${o.id})">Verwijderen</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Storage warning
+  const usage = getStorageUsage();
+  if (usage > 4 * 1024 * 1024) {
+    el.insertAdjacentHTML('beforeend', `<div class="storage-warn warn">⚠ LocalStorage-gebruik: ${formatBytes(usage)} — overweeg een JSON-export en oude bestanden te verwijderen.</div>`);
+  } else if (usage > 0) {
+    el.insertAdjacentHTML('beforeend', `<div class="storage-warn">Opslag in gebruik: ${formatBytes(usage)} (limiet ~5 MB)</div>`);
+  }
+}
+
+function getFileIcon(name, type) {
+  const ext = (name||'').split('.').pop().toLowerCase();
+  if (['pdf'].includes(ext)) return 'PDF';
+  if (['doc','docx'].includes(ext)) return 'DOC';
+  if (['ppt','pptx'].includes(ext)) return 'PPT';
+  if (['xls','xlsx','csv'].includes(ext)) return 'XLS';
+  if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) return 'IMG';
+  if (['mp3','wav','m4a'].includes(ext)) return 'AUD';
+  if (['mp4','mov','webm'].includes(ext)) return 'VID';
+  return 'FILE';
+}
+
+// ============ MATCH MODULE ============
+let currentMatchMode = 'paste';
+let vacatureExtractedText = '';
+
+function switchMatchMode(mode) {
+  currentMatchMode = mode;
+  document.querySelectorAll('.match-tab-toggle button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('match-paste-mode').style.display = mode === 'paste' ? 'block' : 'none';
+  document.getElementById('match-upload-mode').style.display = mode === 'upload' ? 'block' : 'none';
+}
+
+async function handleVacatureUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const status = document.getElementById('m-upload-status');
+  const preview = document.getElementById('m-extract-preview');
+  status.textContent = '⌛ Bestand wordt gelezen...';
+  status.style.color = 'var(--slate)';
+  preview.style.display = 'none';
+
+  try {
+    const ext = file.name.split('.').pop().toLowerCase();
+    let text = '';
+    if (ext === 'pdf') {
+      text = await extractPDFText(file);
+    } else if (ext === 'docx') {
+      text = await extractDocxText(file);
+    } else if (ext === 'txt') {
+      text = await file.text();
+    } else {
+      throw new Error('Bestandstype niet ondersteund. Gebruik PDF, DOCX of TXT.');
+    }
+    vacatureExtractedText = text;
+    status.innerHTML = `✓ "${escape(file.name)}" gelezen — ${text.length.toLocaleString('nl-NL')} tekens uit ~${Math.ceil(text.length/2500)} pagina(s).`;
+    status.style.color = 'var(--moss)';
+    preview.style.display = 'block';
+    preview.innerHTML = `<div class="vacature-extract"><h5>Extract preview</h5>${escape(text.slice(0, 1500))}${text.length > 1500 ? '... [' + (text.length - 1500) + ' tekens meer]' : ''}</div>`;
+  } catch (err) {
+    status.textContent = '⨯ Fout: ' + err.message;
+    status.style.color = 'var(--rust)';
+    vacatureExtractedText = '';
+  }
+}
+
+async function extractPDFText(file) {
+  if (!window.pdfjsLib) throw new Error('PDF-bibliotheek niet geladen.');
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(item => item.str).join(' ') + '\n\n';
+  }
+  return text.trim();
+}
+
+async function extractDocxText(file) {
+  if (!window.mammoth) throw new Error('DOCX-bibliotheek niet geladen.');
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer });
+  return result.value.trim();
+}
+
+function clearMatchForm() {
+  ['m-functietitel','m-organisatie','m-tekst','m-functietitel-up','m-organisatie-up'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('m-upload-status').textContent = '';
+  document.getElementById('m-extract-preview').style.display = 'none';
+  document.getElementById('m-extract-preview').innerHTML = '';
+  document.getElementById('match-result').style.display = 'none';
+  vacatureExtractedText = '';
+}
+
+async function runMatchAnalyse() {
+  let functietitel, organisatie, vacatureTekst;
+  if (currentMatchMode === 'paste') {
+    functietitel = document.getElementById('m-functietitel').value.trim();
+    organisatie = document.getElementById('m-organisatie').value.trim();
+    vacatureTekst = document.getElementById('m-tekst').value.trim();
+  } else {
+    functietitel = document.getElementById('m-functietitel-up').value.trim();
+    organisatie = document.getElementById('m-organisatie-up').value.trim();
+    vacatureTekst = vacatureExtractedText;
+  }
+  if (!vacatureTekst || vacatureTekst.length < 100) {
+    alert('Plak of upload eerst een vacaturetekst (minimaal 100 tekens).');
+    return;
+  }
+  if (!functietitel) {
+    if (!confirm('Geen functietitel ingevuld. Doorgaan zonder?')) return;
+    functietitel = '(onbekend)';
+  }
+  if (!state.api.key) {
+    alert('Geen API-key ingesteld.');
+    switchTab('instellingen');
+    return;
+  }
+
+  const btn = document.getElementById('btn-match');
+  const result = document.getElementById('match-result');
+  const out = document.getElementById('ai-out-match');
+  result.style.display = 'block';
+  out.innerHTML = '<span class="spinner"></span> Claude analyseert de match — dit kan 20-40 seconden duren...';
+  btn.disabled = true;
+  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const prompt = buildMatchPrompt(functietitel, organisatie, vacatureTekst);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': state.api.key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: state.api.model,
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) {
+      out.innerHTML = '<span style="color:var(--rust)">Fout: ' + escape(data.error.message) + '</span>';
+    } else {
+      const text = data.content?.map(c => c.text || '').join('\n') || '(geen antwoord)';
+      const parsed = parseMatchResponse(text);
+      out.innerHTML = renderMatchResult(parsed, text);
+
+      // Bewaar in geschiedenis
+      state.matches.unshift({
+        id: Date.now(),
+        datum: new Date().toISOString(),
+        functietitel: functietitel,
+        organisatie: organisatie,
+        vacatureTekstSample: vacatureTekst.slice(0, 500),
+        analyse: text,
+        score: parsed.score,
+        pillars: parsed.pillars
+      });
+      // Limiteer geschiedenis tot 25
+      if (state.matches.length > 25) state.matches = state.matches.slice(0, 25);
+      persist();
+    }
+  } catch (err) {
+    out.innerHTML = '<span style="color:var(--rust)">Netwerkfout: ' + escape(err.message) + '</span>';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function buildMatchPrompt(functietitel, organisatie, vacatureTekst) {
+  return `Je bent een ervaren executive search-consultant én RvB-lid die kandidaten beoordeelt voor leidinggevende functies in de Nederlandse (semi-)publieke sector. Reageer in het Nederlands. Wees scherp, eerlijk en gebruik concrete bewijsstukken uit de data, niet algemeenheden.
+
+${ASSESSMENT_CONTEXT}
+
+PROFIEL VAN DE KANDIDAAT (Marcel):
+- Huidige rol: tweede-lijns manager UWV (Business Control, Kwaliteit, Compliance).
+- Ambitie: tweede-echelon doorstroom.
+- Heeft een MD-traject lopend, werkt actief met coach/begeleider, sponsor-vraag is een aandachtspunt.
+- Bouwt zelf sophisticated offline HTML-tools voor zijn werk en eigen ontwikkeling — toont ambacht én risico op "presteren-via-doen".
+
+${buildDataContext()}
+
+VACATURE (door gebruiker aangeleverd):
+Functietitel: ${functietitel}
+Organisatie: ${organisatie || '(niet ingevuld)'}
+
+VACATURETEKST:
+"""
+${vacatureTekst.slice(0, 12000)}
+"""
+
+OPDRACHT — Geef een matchanalyse in EXACT deze structuur, met deze markers (voor parsing):
+
+### MATCHSCORE
+[Geef een getal 0-100 dat de overall match weergeeft. Wees realistisch, geen inflatie. 70-80 = sterke match. 50-65 = match met aandachtspunten. <50 = stretchrol of mismatch.]
+
+### PIJLERS
+Score elke pijler 0-100, formaat exact "PIJLER NAAM: getal":
+- HARDE FIT (ervaring, vakinhoud, sector, niveau): getal
+- COMPETENTIEFIT (gevraagde competenties versus zijn strengths/zwaktes): getal
+- DRIJFVEERFIT (passen zijn drijfveren Team/Rechtvaardigheid/Zorg bij deze rol): getal
+- ONTWIKKELFIT (past deze rol bij zijn ontwikkellijnen of overstrekt het ze): getal
+
+### KORTE VERDICT
+[Een zin van max 25 woorden. Eerlijk, niet vleierij, niet vernietigend.]
+
+### KRACHTEN VOOR DEZE ROL
+[3-5 bullets: waar specifiek de match sterk is. Verwijs naar zijn assessment, ervaring of data uit zijn tool. Geen algemeenheden.]
+
+### RISICO'S EN GAPS
+[3-5 bullets: waar deze rol overspant of mismatcht. Wees concreet. Bedenk: bij iemand met "presteren = meer doen"-overtuiging zal hij geneigd zijn om gaps te bagatelliseren — wees daarom kritisch.]
+
+### KRITISCHE BEOORDELING ALS RVB-LID
+[Een paragraaf van 100-150 woorden waarin je vanuit de blik van een RvB-lid spreekt: zou jij hem aannemen, op welke voorwaarden, wat zou je toetsen in het gesprek? Wees zoals een echte RvB-er — niet politiek correct, wel zorgvuldig.]
+
+### GESPREKSSTRATEGIE
+[Wat moet hij in het gesprek expliciet adresseren, welke voorbeelden moet hij paraat hebben (verwijs naar zijn data uit de tool als die er is), waar moet hij niét op aandringen? 3-4 concrete tips.]
+
+### CHECKVRAGEN VOOR HEMZELF VOORAF
+[3 vragen die hij voor zichzelf moet beantwoorden vóór hij solliciteert. Eerlijke, lastige vragen — geen pep-talk.]`;
+}
+
+function parseMatchResponse(text) {
+  const result = {
+    score: null,
+    pillars: { hard: null, competentie: null, drijfveer: null, ontwikkel: null },
+    verdict: '',
+    krachten: [],
+    risicos: [],
+    rvb: '',
+    strategie: [],
+    checkvragen: [],
+    raw: text
+  };
+  // Score
+  const scoreMatch = text.match(/###\s*MATCHSCORE\s*\n+\s*\[?(\d+)\]?/i);
+  if (scoreMatch) result.score = parseInt(scoreMatch[1]);
+
+  // Pijlers
+  const pillarMatches = {
+    hard: /HARDE\s*FIT[^:]*:\s*(\d+)/i,
+    competentie: /COMPETENTIEFIT[^:]*:\s*(\d+)/i,
+    drijfveer: /DRIJFVEERFIT[^:]*:\s*(\d+)/i,
+    ontwikkel: /ONTWIKKELFIT[^:]*:\s*(\d+)/i
+  };
+  Object.entries(pillarMatches).forEach(([k, re]) => {
+    const m = text.match(re);
+    if (m) result.pillars[k] = parseInt(m[1]);
+  });
+
+  // Verdict
+  const verdictMatch = text.match(/###\s*KORTE\s*VERDICT\s*\n+([^#]+?)(?=###|$)/i);
+  if (verdictMatch) result.verdict = verdictMatch[1].trim().replace(/^\[|\]$/g, '');
+
+  return result;
+}
+
+function renderMatchResult(parsed, rawText) {
+  const score = parsed.score || 0;
+  const scoreColor = score >= 70 ? 'var(--moss)' : score >= 50 ? 'var(--gold)' : 'var(--rust)';
+  const scoreLabel = score >= 80 ? 'Sterke match' : score >= 65 ? 'Goede match' : score >= 50 ? 'Match met aandachtspunten' : score >= 35 ? 'Stretchrol' : 'Mismatch';
+
+  // Pillars HTML
+  const pillarsList = [
+    { k: 'hard', label: 'Harde Fit', desc: 'Ervaring & sector' },
+    { k: 'competentie', label: 'Competentiefit', desc: 'Strengths' },
+    { k: 'drijfveer', label: 'Drijfveerfit', desc: 'Motieven' },
+    { k: 'ontwikkel', label: 'Ontwikkelfit', desc: 'Lijnen' }
+  ];
+  const pillarsHTML = pillarsList.map(p => {
+    const val = parsed.pillars[p.k] || 0;
+    const cls = val >= 70 ? 'high' : val >= 50 ? 'mid' : 'low';
+    return `<div class="match-pillar ${cls}">
+      <div class="mp-label">${p.label}</div>
+      <div class="mp-score">${val}</div>
+      <div class="mp-bar"><div class="mp-fill" style="width:${val}%;background:${val>=70?'var(--moss)':val>=50?'var(--gold)':'var(--rust)'}"></div></div>
+      <div style="font-size:9px;color:var(--slate);margin-top:4px;letter-spacing:0.08em;">${p.desc.toUpperCase()}</div>
+    </div>`;
+  }).join('');
+
+  // Full analysis (gewone markdown)
+  const restHTML = formatMarkdown(rawText);
+
+  return `<div class="match-score-block">
+    <div class="match-score-circle" style="background: conic-gradient(${scoreColor} ${score * 3.6}deg, var(--ink-3) ${score * 3.6}deg); padding: 8px;">
+      <div style="background:var(--ink); width:100%; height:100%; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div class="match-score-num" style="color:${scoreColor}">${score}</div>
+        <div class="match-score-label">${scoreLabel}</div>
+      </div>
+    </div>
+    ${parsed.verdict ? `<div class="match-verdict"><em>"</em>${escape(parsed.verdict)}<em>"</em></div>` : ''}
+    <div class="match-pillars">${pillarsHTML}</div>
+  </div>
+  <div style="margin-top: 20px;">${restHTML}</div>`;
+}
+
+function renderMatchHistory() {
+  const el = document.getElementById('match-history');
+  if (!el) return;
+  const matches = state.matches || [];
+  if (matches.length === 0) {
+    el.innerHTML = '<div class="empty">Nog geen analyses bewaard.</div>';
+    return;
+  }
+  el.innerHTML = matches.map(m => {
+    const score = m.score || 0;
+    const scoreColor = score >= 70 ? 'var(--moss)' : score >= 50 ? 'var(--gold)' : 'var(--rust)';
+    const datum = new Date(m.datum);
+    return `<div class="match-history-row">
+      <div>
+        <div class="mh-titel">${escape(m.functietitel||'(geen titel)')}</div>
+        <div class="mh-meta">${escape(m.organisatie||'')} · ${datum.toLocaleDateString('nl-NL')}</div>
+      </div>
+      <div style="font-family:'Fraunces',serif; font-size:28px; color:${scoreColor};">${score}</div>
+      <div class="entry-actions">
+        <button class="icon-btn" onclick="viewMatch(${m.id})" title="Bekijken">↗</button>
+        <button class="icon-btn danger" onclick="deleteMatch(${m.id})" title="Verwijderen">⨯</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function viewMatch(id) {
+  const m = state.matches.find(x => x.id === id);
+  if (!m) return;
+  const parsed = parseMatchResponse(m.analyse);
+  const out = document.getElementById('ai-out-match');
+  out.innerHTML = renderMatchResult(parsed, m.analyse);
+  document.getElementById('match-result').style.display = 'block';
+  document.getElementById('match-result').scrollIntoView({ behavior: 'smooth' });
+}
+
+function deleteMatch(id) {
+  if (!confirm('Deze matchanalyse verwijderen?')) return;
+  state.matches = state.matches.filter(x => x.id !== id);
+  persist();
+}
+
+// ============ CHARTS ============
+function renderCharts() {
+  renderNormChart();
+  renderSpanningChart();
+}
+
+function groupByMonth(items, dateField, valueFn) {
+  const buckets = {};
+  items.forEach(item => {
+    const d = item[dateField];
+    if (!d) return;
+    const ym = d.slice(0, 7); // YYYY-MM
+    if (!buckets[ym]) buckets[ym] = [];
+    const v = valueFn(item);
+    if (v !== null && v !== undefined) buckets[ym].push(v);
+  });
+  return Object.entries(buckets)
+    .sort((a,b) => a[0].localeCompare(b[0]))
+    .map(([ym, vals]) => ({ ym, vals }));
+}
+
+function renderNormChart() {
+  const el = document.getElementById('chart-norm');
+  if (!el) return;
+  if (!Array.isArray(state.ontwikkel)) state.ontwikkel = [];
+  const monthly = groupByMonth(state.ontwikkel, 'datum', e => {
+    if (!e.norm?.score || e.norm.score === 'nvt') return null;
+    return e.norm.score === 'ja' ? 1 : e.norm.score === 'deels' ? 0.5 : 0;
+  });
+  if (monthly.length === 0) {
+    el.innerHTML = '<div class="chart-empty">Nog geen data — registreer eerst op tab Ontwikkellijnen.</div>';
+    return;
+  }
+  const points = monthly.map(m => ({
+    ym: m.ym,
+    pct: m.vals.length ? Math.round(m.vals.reduce((s,v)=>s+v,0) / m.vals.length * 100) : 0,
+    n: m.vals.length
+  }));
+  el.innerHTML = drawLineChart(points, p => p.pct, p => `${p.ym}: ${p.pct}% (n=${p.n})`, 0, 100, '%', 'var(--moss)');
+}
+
+function renderSpanningChart() {
+  const el = document.getElementById('chart-spanning');
+  if (!el) return;
+  if (!Array.isArray(state.ontwikkel)) state.ontwikkel = [];
+  if (!Array.isArray(state.spanning)) state.spanning = [];
+  // Combine ontwikkel.dosering.spanning + spanning.niveau
+  const items = [
+    ...state.ontwikkel.map(e => ({ datum: e.datum, n: parseInt(e.dosering?.spanning) })),
+    ...state.spanning.map(e => ({ datum: e.datum, n: parseInt(e.niveau) }))
+  ].filter(x => !isNaN(x.n));
+  const monthly = groupByMonth(items, 'datum', x => x.n);
+  if (monthly.length === 0) {
+    el.innerHTML = '<div class="chart-empty">Nog geen data — registreer eerst spanningsniveaus.</div>';
+    return;
+  }
+  const points = monthly.map(m => ({
+    ym: m.ym,
+    avg: m.vals.length ? m.vals.reduce((s,v)=>s+v,0) / m.vals.length : 0,
+    n: m.vals.length
+  }));
+  el.innerHTML = drawLineChart(points, p => p.avg, p => `${p.ym}: gem. ${p.avg.toFixed(1)} (n=${p.n})`, 0, 5, '', 'var(--gold)');
+}
+
+function drawLineChart(points, valFn, tooltipFn, minY, maxY, unit, color) {
+  if (points.length === 0) return '<div class="chart-empty">Geen data</div>';
+  const w = 600, h = 180, padL = 40, padR = 20, padT = 20, padB = 30;
+  const cw = w - padL - padR;
+  const ch = h - padT - padB;
+  const range = maxY - minY;
+  const stepX = points.length > 1 ? cw / (points.length - 1) : cw;
+
+  const pts = points.map((p, i) => {
+    const x = padL + i * stepX;
+    const y = padT + ch - ((valFn(p) - minY) / range * ch);
+    return { x, y, p };
+  });
+
+  const path = pts.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`).join(' ');
+  const dots = pts.map(pt => `<circle cx="${pt.x}" cy="${pt.y}" r="4" fill="${color}" stroke="var(--ink)" stroke-width="2"><title>${escape(tooltipFn(pt.p))}</title></circle>`).join('');
+  const labels = pts.map(pt => {
+    const mm = pt.p.ym.slice(5);
+    const yy = pt.p.ym.slice(2,4);
+    return `<text x="${pt.x}" y="${h - 8}" text-anchor="middle" fill="var(--slate)" font-size="9" font-family="Inter Tight">${mm}/${yy}</text>`;
+  }).join('');
+  // Y-axis labels
+  const yLabels = [minY, (minY+maxY)/2, maxY].map(v => {
+    const y = padT + ch - ((v - minY) / range * ch);
+    return `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="var(--slate)" font-size="9" font-family="Inter Tight">${typeof v === 'number' && !Number.isInteger(v) ? v.toFixed(1) : v}${unit}</text>
+            <line x1="${padL}" y1="${y}" x2="${w-padR}" y2="${y}" stroke="var(--line)" stroke-width="1" stroke-dasharray="2,4"/>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;">
+    ${yLabels}
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="2" />
+    ${dots}
+    ${labels}
+  </svg>`;
+}
+function renderSparring() {
+  const el = document.getElementById('sparring-list');
+  if (!el) return;
+  if (!Array.isArray(state.sparring)) state.sparring = [];
+  if (state.sparring.length === 0) { el.innerHTML = '<div class="empty">Nog geen gesprekken vastgelegd.</div>'; return; }
+  el.innerHTML = state.sparring.map(e => {
+    const rolBadge = e.rol ? `<span class="tag ${rolColorClass(e.rol)}">${formatRol(e.rol)}</span>` : '';
+    return `<div class="entry-row">
+      <div class="entry-date">${formatDate(e.datum)}</div>
+      <div class="entry-main">
+        <div class="entry-h">${escape(e.partner)} ${rolBadge}</div>
+        <div class="entry-d"><span class="tag gold">${e.lijn||'—'}</span> ${escape((e.inzicht||'').slice(0,140))}${(e.inzicht||'').length>140?'…':''}</div>
+      </div>
+      <div class="entry-actions">
+        <button class="icon-btn" onclick="editSparring(${e.id})" title="Bewerken">✎</button>
+        <button class="icon-btn danger" onclick="deleteSparring(${e.id})" title="Verwijderen">⨯</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function rolColorClass(rol) {
+  if (rol === 'leidinggevende') return 'blue';
+  if (rol === 'sponsor') return 'gold';
+  if (rol === 'md_adviseur') return 'purple';
+  if (rol === 'begeleider') return 'moss';
+  return '';
+}
+function formatRol(rol) {
+  if (rol === 'leidinggevende') return 'Leidinggevende';
+  if (rol === 'sponsor') return 'Sponsor';
+  if (rol === 'md_adviseur') return 'MD-adviseur';
+  if (rol === 'begeleider') return 'Begeleider';
+  if (rol === 'peer') return 'Peer';
+  return rol || '—';
+}
+
+// ============ RENDER ROLLEN ============
+function renderRollen() {
+  const cont = document.getElementById('role-cards');
+  if (!cont) return;
+  if (!state.rollen || typeof state.rollen !== 'object') state.rollen = JSON.parse(JSON.stringify(DEFAULT_ROLES));
+  if (!Array.isArray(state.sparring)) state.sparring = [];
+  if (!Array.isArray(state.afspraken)) state.afspraken = [];
+  if (!Array.isArray(state.acties)) state.acties = [];
+  cont.innerHTML = Object.entries(state.rollen).map(([key, r]) => {
+    const sparrings = state.sparring.filter(s => s.rol === key).length;
+    const afspraken = state.afspraken.filter(a => a.rol === key && (a.status === 'actief' || a.status === 'gepland')).length;
+    const acties = state.acties.filter(a => a.rol === key && a.status !== 'afgerond' && a.status !== 'geparkeerd').length;
+    return `<div class="role-card role-${key}">
+      <div class="role-header">
+        <div>
+          <div class="role-name">${escape(r.persoon) || '<span style="color:var(--slate);font-style:italic">— nog niet ingevuld —</span>'}</div>
+          <div class="role-type">${r.type}</div>
+        </div>
+      </div>
+      <div class="role-purpose">${escape(r.purpose)}</div>
+      ${r.cadans ? `<div style="font-size:11px;color:var(--paper-dim);margin-bottom:8px;"><strong style="color:var(--gold);font-weight:500">CADANS:</strong> ${escape(r.cadans)}</div>` : ''}
+      ${r.verwachting ? `<div style="font-size:11px;color:var(--paper-dim);margin-bottom:8px;"><strong style="color:var(--gold);font-weight:500">VERWACHTING:</strong> ${escape(r.verwachting.slice(0,100))}${r.verwachting.length>100?'…':''}</div>` : ''}
+      <div class="role-stats">
+        <div class="role-stat"><div class="v">${sparrings}</div><div class="l">gesprek</div></div>
+        <div class="role-stat"><div class="v">${afspraken}</div><div class="l">afspraak</div></div>
+        <div class="role-stat"><div class="v">${acties}</div><div class="l">actie</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Detail blocks per rol
+  const detail = document.getElementById('role-detail-blocks');
+  detail.innerHTML = Object.entries(state.rollen).map(([key, r]) => {
+    const sparrings = state.sparring.filter(s => s.rol === key);
+    const afspraken = state.afspraken.filter(a => a.rol === key);
+    const acties = state.acties.filter(a => a.rol === key);
+    const totaal = sparrings.length + afspraken.length + acties.length;
+    return `<div style="margin-bottom: 32px;">
+      <h3 style="font-family: 'Fraunces', serif; font-size: 19px; color: var(--gold-bright); margin-bottom: 4px;">${r.type}<span style="color: var(--paper); font-weight: 300;"> — ${escape(r.persoon) || '<em style="color:var(--slate)">geen persoon ingevuld</em>'}</span></h3>
+      <p style="color: var(--slate); font-size: 12px; margin-bottom: 14px;">${totaal === 0 ? 'Nog niets geregistreerd.' : `${sparrings.length} gesprek(ken) · ${afspraken.length} afspra(a)k(en) · ${acties.length} acties`}</p>
+      ${totaal === 0 ? '' : `<div class="detail-list">
+        ${afspraken.map(a => `<div class="detail-item tag-afspraak"><div class="di-meta">AFSPRAAK · ${escape(a.freq)} · volgende: ${a.volgend ? formatDate(a.volgend) : '—'} · ${a.status}</div><div class="di-content"><strong>${escape(a.titel)}</strong>${a.doel ? ' — ' + escape(a.doel.slice(0,150)) : ''}</div></div>`).join('')}
+        ${acties.filter(a => a.status !== 'afgerond').map(a => `<div class="detail-item tag-actie"><div class="di-meta">ACTIE · deadline: ${a.deadline ? formatDate(a.deadline) : '—'} · ${a.status}</div><div class="di-content">${escape(a.titel)}</div></div>`).join('')}
+        ${sparrings.slice(0,3).map(s => `<div class="detail-item tag-sparring"><div class="di-meta">GESPREK · ${formatDate(s.datum)}</div><div class="di-content">${escape((s.inzicht||s.vraag||'').slice(0,180))}</div></div>`).join('')}
+      </div>`}
+    </div>`;
+  }).join('');
+}
+
+// ============ RENDER AFSPRAKEN ============
+function renderAfspraken() {
+  const el = document.getElementById('afspraak-list');
+  if (!el) return;
+  if (!Array.isArray(state.afspraken)) state.afspraken = [];
+  let list = state.afspraken;
+  if (filterRol !== 'all') list = list.filter(a => a.rol === filterRol);
+  if (list.length === 0) { el.innerHTML = '<div class="empty">Geen afspraken in deze filter.</div>'; return; }
+  const today = new Date().toISOString().slice(0,10);
+  // Sort by next date asc, with no-date last
+  list = [...list].sort((a,b) => {
+    if (!a.volgend && !b.volgend) return 0;
+    if (!a.volgend) return 1;
+    if (!b.volgend) return -1;
+    return a.volgend.localeCompare(b.volgend);
+  });
+  el.innerHTML = list.map(a => {
+    const rolBadge = a.rol ? `<span class="tag ${rolColorClass(a.rol)}">${formatRol(a.rol)}</span>` : '';
+    const statusBadge = `<span class="tag ${a.status==='actief'?'moss':a.status==='gepland'?'gold':a.status==='gepauzeerd'?'rust':''}">${a.status}</span>`;
+    const dateClass = a.volgend && a.volgend < today ? 'deadline-overdue' : 'deadline-ok';
+    return `<div class="entry-row">
+      <div class="entry-date ${dateClass}">${a.volgend ? formatDate(a.volgend) : '—'}</div>
+      <div class="entry-main">
+        <div class="entry-h">${escape(a.titel)}</div>
+        <div class="entry-d">${rolBadge}${statusBadge}<span class="tag">${escape(a.freq)}</span> ${escape((a.doel||'').slice(0,140))}${(a.doel||'').length>140?'…':''}</div>
+      </div>
+      <div class="entry-actions">
+        <button class="icon-btn" onclick="editAfspraak(${a.id})" title="Bewerken">✎</button>
+        <button class="icon-btn danger" onclick="deleteAfspraak(${a.id})" title="Verwijderen">⨯</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============ RENDER ACTIES ============
+function renderActies() {
+  const el = document.getElementById('actie-list');
+  if (!el) return;
+  if (!Array.isArray(state.acties)) state.acties = [];
+  let list = state.acties;
+  if (filterActieStatus !== 'all') list = list.filter(a => a.status === filterActieStatus);
+  if (filterActieRol !== 'all') list = list.filter(a => a.rol === filterActieRol);
+  if (list.length === 0) { el.innerHTML = '<div class="empty">Geen acties in deze filter.</div>'; return; }
+  const today = new Date().toISOString().slice(0,10);
+  // Sort: open/bezig eerst, dan op deadline
+  list = [...list].sort((a,b) => {
+    const aActive = (a.status === 'open' || a.status === 'bezig') ? 0 : 1;
+    const bActive = (b.status === 'open' || b.status === 'bezig') ? 0 : 1;
+    if (aActive !== bActive) return aActive - bActive;
+    if (!a.deadline && !b.deadline) return 0;
+    if (!a.deadline) return 1;
+    if (!b.deadline) return -1;
+    return a.deadline.localeCompare(b.deadline);
+  });
+  el.innerHTML = list.map(a => {
+    const rolBadge = a.rol ? `<span class="tag ${rolColorClass(a.rol)}">${formatRol(a.rol)}</span>` : '';
+    const lijnBadge = a.lijn ? `<span class="tag gold">${a.lijn}</span>` : '';
+    const statusClass = a.status === 'afgerond' ? 'status-done' : a.status === 'geblokkeerd' ? 'status-blocked' : a.status === 'geparkeerd' ? 'status-parked' : 'status-open';
+    const overdue = a.deadline && a.deadline < today && a.status !== 'afgerond' && a.status !== 'geparkeerd';
+    const dateClass = overdue ? 'deadline-overdue' : (a.status === 'afgerond' ? 'deadline-ok' : 'deadline-ok');
+    return `<div class="entry-row" style="${a.status==='afgerond'?'opacity:0.55':''}">
+      <div class="entry-date ${dateClass}">${a.deadline ? formatDate(a.deadline) : '—'}</div>
+      <div class="entry-main">
+        <div class="entry-h" style="${a.status==='afgerond'?'text-decoration:line-through':''}">${escape(a.titel)}</div>
+        <div class="entry-d"><span class="tag ${statusClass}">${a.status}</span>${rolBadge}${lijnBadge} ${escape((a.achtergrond||'').slice(0,100))}</div>
+      </div>
+      <div class="entry-actions">
+        <button class="icon-btn" onclick="toggleActieStatus(${a.id})" title="${a.status==='afgerond'?'Heropen':'Markeer als afgerond'}">✓</button>
+        <button class="icon-btn" onclick="editActie(${a.id})" title="Bewerken">✎</button>
+        <button class="icon-btn danger" onclick="deleteActie(${a.id})" title="Verwijderen">⨯</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('nl-NL', { day: '2-digit', month: 'short' });
+}
+function escape(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ============ AI ============
+const ASSESSMENT_CONTEXT = `
+ASSESSMENTPROFIEL (referentie):
+- CliftonStrengths Top 5: Woo, Positivisme, Individualisering, Communicatie, Organisatievermogen (vier in Beïnvloeden & Relatie bouwen).
+- CliftonStrengths Bottom: Behoedzaamheid, Sturingskracht, Significantie onderaan. Strategisch/Analytisch/Intellect buiten bovenste helft.
+- GITP Potential drie ontwikkeldoelen: (1) Eerder positie innemen, (2) Bestuurlijke sensitiviteit, (3) Focus & dosering.
+- Drijfveren: Team, Rechtvaardigheid, Zorg.
+- Kernovertuiging te doorbreken: "Doseren is een valkuil omdat presteren belangrijk is."
+- Drijfveer Zorg moet in zwaardere rol via systemen/leidinggevenden i.p.v. zelf dragen.
+- Rol: tweede-lijns manager UWV. Ambitie: tweede echelon.
+- Inhoudelijke ambitie: van terugblikkende naar voorspellende sturing bij UWV.
+`;
+
+async function callAnthropic(prompt, btnId, outputId) {
+  if (!state.api.key) {
+    alert('Geen API-key ingesteld. Ga naar Instellingen.');
+    switchTab('instellingen');
+    return;
+  }
+  const btn = btnId ? document.getElementById(btnId) : null;
+  const out = document.getElementById(outputId);
+  out.style.display = 'block';
+  out.innerHTML = '<span class="spinner"></span> Claude denkt na...';
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': state.api.key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: state.api.model,
+        max_tokens: 2500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) {
+      out.innerHTML = '<span style="color:var(--rust)">Fout: ' + escape(data.error.message) + '</span>';
+    } else {
+      const text = data.content?.map(c => c.text || '').join('\n') || '(geen antwoord)';
+      out.innerHTML = formatMarkdown(text);
+    }
+  } catch (err) {
+    out.innerHTML = '<span style="color:var(--rust)">Netwerkfout: ' + escape(err.message) + '</span>';
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+function formatMarkdown(text) {
+  let html = escape(text);
+  html = html.replace(/^### (.*)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^## (.*)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^# (.*)$/gm, '<h4>$1</h4>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
+  html = html.replace(/\n\n/g, '</p><p>');
+  return '<p>' + html + '</p>';
+}
+function buildDataContext() {
+  // Strip file-data uit opleidingen om token-budget niet op te blazen
+  const opleidingenLicht = (state.opleidingen||[]).map(o => ({
+    titel: o.titel, aanbieder: o.aanbieder, status: o.status, type: o.type,
+    start: o.start, eind: o.eind, lijn: o.lijn, doorloop: o.doorloop,
+    doel: o.doel, inzichten: o.inzichten,
+    bestanden: (o.uploads||[]).map(u => u.name)
+  }));
+  return `\nHUIDIGE DATA:
+- Rollen: ${JSON.stringify(state.rollen)}
+- Ontwikkellijn-logs (${state.ontwikkel.length}): ${JSON.stringify(state.ontwikkel.slice(0, 20))}
+- Spanningslogs (${state.spanning.length}): ${JSON.stringify(state.spanning.slice(0, 20))}
+- Afspraken (${state.afspraken.length}): ${JSON.stringify(state.afspraken)}
+- Acties (${state.acties.length}): ${JSON.stringify(state.acties.slice(0, 30))}
+- Opleidingen (${(state.opleidingen||[]).length}): ${JSON.stringify(opleidingenLicht)}
+- Leeslijst (${state.lees.length}): ${JSON.stringify(state.lees.slice(0, 30))}
+- Sparringgesprekken (${state.sparring.length}): ${JSON.stringify(state.sparring.slice(0, 20))}
+- Eigen nuance op assessment: ${state.assessmentExtra || '(geen)'}
+`;
+}
+
+function runAISynthese() {
+  const prompt = `Je bent MD-coach voor een tweede-lijns manager in de Nederlandse publieke sector (UWV), op weg naar tweede echelon. Reageer in het Nederlands, scherp en zonder leiderschapsclichés.
+${ASSESSMENT_CONTEXT}
+${buildDataContext()}
+
+OPDRACHT: Geef een synthese op vijf punten:
+1. **Wat zie je in de data?** — concrete observaties.
+2. **Welke patronen vallen op?** — over modules heen.
+3. **Wat zegt de vierhoek van rollen?** — leidinggevende, sponsor, MD-adviseur, begeleider: welke is goed bezet, welke onderontwikkeld? Wat zegt de divergentie of stilte?
+4. **Wat is de blinde vlek waar de data op wijst?**
+5. **Eerstvolgende interventie (één)** — concreet, klein, doenbaar.
+
+Max 550 woorden. Geen bullet lists tenzij nodig.`;
+  callAnthropic(prompt, 'btn-synthese', 'ai-out-synthese');
+}
+
+function runAIOntwikkel() {
+  const prompt = `Je bent MD-coach. Reageer in het Nederlands, scherp.
+${ASSESSMENT_CONTEXT}
+${buildDataContext()}
+
+OPDRACHT: Analyseer specifiek de ontwikkellijn-registraties (${state.ontwikkel.length}). Op drie lijnen: norm uitspreken, stakeholderanalyse, dosering & spanning. Per lijn: één observatie + één concrete suggestie. Sluit af met drie vragen die je beantwoord wilt zien in volgende registraties. Max 450 woorden.`;
+  callAnthropic(prompt, null, 'ai-out-ontwikkel');
+}
+
+function runAISpanning() {
+  const prompt = `Je bent MD-coach met expertise in overtuigingen onder druk.
+${ASSESSMENT_CONTEXT}
+${buildDataContext()}
+
+OPDRACHT: Cluster spanningslogs op overtuigingen. Welke komt vaakst terug? Toets de hypothese "doseren is valkuil omdat presteren belangrijk is" tegen de data. Klopt het, of zit er iets diepers achter? Sluit af met één rituele check-vraag voor in het moment. Max 450 woorden.`;
+  callAnthropic(prompt, null, 'ai-out-spanning');
+}
+
+function runAIRollen() {
+  const prompt = `Je bent MD-coach. Reageer in het Nederlands.
+${ASSESSMENT_CONTEXT}
+${buildDataContext()}
+
+OPDRACHT: Analyseer de vierhoek leidinggevende / sponsor / MD-adviseur / begeleider rond zijn traject.
+
+1. **Welke rol levert het meeste signaal?** — hoeveel gesprekken, afspraken, acties? Wat zegt de balans?
+2. **Welke rol is onderbenut of leeg?** — en wat is daarvan het risico?
+3. **Convergentie versus divergentie** — als rollen verschillende dingen zien (output / potentie / proces / patroon), waar zit dan de spanning tussen die signalen?
+4. **De sponsorvraag specifiek** — sponsorship is vaak het cruciale ontbrekende stuk voor doorstroom naar tweede echelon. Hoe sterk staat dit?
+5. **Eén concrete interventie** — wat zou hij deze maand moeten doen om de zwakste rol te versterken?
+
+Max 500 woorden. Wees concreet, gebruik de feitelijke data, geen algemeenheden.`;
+  callAnthropic(prompt, null, 'ai-out-rollen');
+}
+
+function runAIActies() {
+  const prompt = `Je bent MD-coach met scherp prioriteringsoog.
+${ASSESSMENT_CONTEXT}
+${buildDataContext()}
+
+OPDRACHT: Kijk naar zijn open en bezig-acties (${state.acties.filter(a => a.status !== 'afgerond' && a.status !== 'geparkeerd').length} stuks). Geef:
+
+1. **Top 3 deze week** — welke acties zijn nu het belangrijkst en waarom? Verbind aan ontwikkellijn of rol.
+2. **Wat te parkeren of schrappen** — welke acties zijn waarschijnlijk impliciete schijnzekerheid? (Belangrijk: bij iemand met "presteren=meer doen" als overtuiging is schrappen onderdeel van het werk.)
+3. **Wat ontbreekt** — welke acties zou je verwachten op basis van zijn ontwikkellijnen, maar staan er niet?
+
+Wees direct. Max 400 woorden.`;
+  callAnthropic(prompt, null, 'ai-out-acties');
+}
+
+function runAISparring() {
+  const prompt = `Je bent MD-coach. Reageer in het Nederlands.
+${ASSESSMENT_CONTEXT}
+${buildDataContext()}
+
+OPDRACHT: Lees sparring/coachgesprekken. Wees kritisch:
+1. Welke feedback komt herhaaldelijk terug? Heeft hij er iets mee gedaan?
+2. Welke vraag brengt hij steeds opnieuw in — en wat zegt dat?
+3. Waar ontwijkt hij iets? Welke rol/gesprekspartner geeft de scherpste feedback?
+4. Zijn de acties echt acties of voornemens?
+
+Sluit af met één vraag voor zijn volgende coachgesprek. Max 400 woorden. Bedoel als spiegel, niet bevestiging.`;
+  callAnthropic(prompt, null, 'ai-out-sparring');
+}
+
+function runAIOpleidingen() {
+  const opl = state.opleidingen || [];
+  const prompt = `Je bent MD-coach. Reageer in het Nederlands.
+${ASSESSMENT_CONTEXT}
+${buildDataContext()}
+
+OPDRACHT: Analyseer de leerportefeuille (opleidingen, trainingen, hand-outs) van deze tweede-lijns manager op weg naar tweede echelon.
+
+1. **Welke ontwikkellijn krijgt de meeste formele leerstof?** (norm/sensitiviteit/dosering/zorg/vakinhoud) En welke krijgt te weinig?
+2. **Patroon in keuzes** — hebben de opleidingen samenhang of zijn ze ad hoc? Past het programma bij iemand richting tweede echelon, of staat het te dicht op zijn huidige rol?
+3. **Verbinding met de drie ontwikkellijnen** — welk leerdoel uit zijn assessment is nog onbedekt en zou via een opleiding versterkt kunnen worden? Geef één concrete aanbeveling (type opleiding/training, niet per se merk).
+4. **Inzichten-veld** — kijk naar wat hij invulde over "wat heeft het toegevoegd". Schrijft hij abstract/algemeen of concreet/gedragsmatig? (Belangrijk signaal: bij iemand met bewijsdrang kan een opleiding fungeren als verzamelmechanisme zonder gedragsverandering.)
+5. **Risico** — bij "presteren = meer doen" is het stapelen van opleidingen zelf onderdeel van het patroon. Zie je daar tekenen van?
+
+Max 500 woorden. Wees concreet, gebruik de feitelijke data.`;
+  callAnthropic(prompt, null, 'ai-out-opleidingen');
+}
+
+function runAILeeslijst() {
+  const prompt = `Je bent belezen MD-coach.
+${ASSESSMENT_CONTEXT}
+${buildDataContext()}
+
+OPDRACHT: Geef leesaanbevelingen passend bij zijn drie ontwikkellijnen, drijfveren én blinde vlekken. Vermijd clichés en wat al op zijn lijst staat.
+
+Structuur:
+**Ontwikkellijn 1 — Norm uitspreken** (1-2 titels)
+**Ontwikkellijn 2 — Bestuurlijke sensitiviteit publieke sector** (1-2 titels, NL/EU bij voorkeur)
+**Ontwikkellijn 3 — Dosering & overtuiging** (1-2 titels, ook psychologie/filosofie)
+**Drijfveer Zorg in grotere rol** (1 titel)
+**Onverwachte aanbeveling** (1 titel)
+
+Per titel: auteur, kerngedachte in één zin, specifiek waarom dit boek voor hem. Max 600 woorden.`;
+  callAnthropic(prompt, null, 'ai-out-lees');
+}
+
+// ============ INIT ============
+loadState();
+</script>
+
+</body>
+</html>
