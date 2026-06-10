@@ -1,0 +1,1521 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#09090b">
+<title>MOED Luxury Travel Companion v8</title>
+<style>
+:root{--bg:#09090b;--panel:#141419;--card:#1d1d24;--elev:#252531;--gold:#d4af37;--gold2:#f3d875;--text:#f8f4e8;--muted:#b9b6ad;--line:#3c3421;--ok:#45d483;--warn:#ffbf69;--bad:#ff6b6b;--blue:#8ab4ff;--ztl:#ff8c42}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:radial-gradient(circle at 20% 0%,#2a230e 0,#111115 36%,#070708 100%);font-family:'Cormorant Garamond',Georgia,serif;color:var(--text);font-size:17px}
+body.brightmode{background:#fafaf5;color:#1a1a1a}
+body.brightmode .appHeader{background:rgba(250,250,245,.94);border-color:#d4c896}
+body.brightmode h1,body.brightmode h2,body.brightmode h3{color:#8b6b19}
+body.brightmode .card,body.brightmode .dayCard{background:white;border-color:#d4c896;color:#1a1a1a;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+body.brightmode .step,body.brightmode .ibox,body.brightmode .mapPin,body.brightmode details{background:#fffdf3;border-color:#d4c896;color:#1a1a1a}
+body.brightmode .muted{color:#666}
+body.brightmode input,body.brightmode textarea,body.brightmode select{background:white;color:#1a1a1a;border-color:#c8b878}
+body.brightmode .tab{background:#fff;color:#1a1a1a;border-color:#c8b878}
+body.brightmode .tab.active{color:#1a1a1a}
+body.brightmode .badge{background:#f5e8b8;color:#5a4500}
+body.brightmode .pill{background:#fffdf3;color:#1a1a1a;border-color:#c8b878}
+body.brightmode .tripSwitcher{background:#fffdf3;color:#1a1a1a;border-color:#c8b878}
+a{color:var(--gold2)} body.brightmode a{color:#8b6b19}
+p{line-height:1.6;font-family:Inter,system-ui,sans-serif;font-size:15px}
+h1,h2,h3{color:var(--gold2);line-height:1.15;font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;letter-spacing:.01em}
+h1{margin:0;font-size:clamp(28px,4.5vw,48px)} h2{font-size:clamp(24px,3vw,34px);margin:0 0 14px} h3{margin:0 0 10px;font-size:22px}
+.appHeader{position:sticky;top:0;z-index:50;background:rgba(9,9,11,.86);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.hero{max-width:1240px;margin:auto;padding:14px 18px 8px;display:flex;align-items:flex-start;gap:14px}
+.heroText{flex:1;min-width:0;text-align:center}
+.hero h1{font-style:italic;margin:0;font-size:clamp(22px,3.5vw,36px)}
+.subtitle{color:var(--muted);margin:4px 0 0;font-family:Inter,system-ui,sans-serif;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+.themeBtn{flex:0 0 auto;background:transparent;border:1px solid #5b4b1e;color:var(--gold2);border-radius:999px;padding:7px 12px;cursor:pointer;font-size:18px;min-height:40px;min-width:40px;align-self:center}
+.heroActions{display:flex;gap:6px;align-self:center;flex-shrink:0}
+.storageWarning{max-width:1240px;margin:0 auto;padding:10px 18px;background:#5a1818;color:#ffdada;border-top:2px solid #ff6b6b;font-family:Inter,sans-serif;font-size:13px;font-weight:600}
+.storageWarning a{color:#ffe58a;text-decoration:underline}
+.tripBar{max-width:1240px;margin:auto;padding:6px 18px 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tripSwitcher{flex:1;min-width:200px;border:1px solid #5b4b1e;background:#15151a;color:var(--text);padding:9px 12px;border-radius:12px;font:inherit;font-family:Inter,sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+.tripBar .btn{margin:0;padding:8px 12px;font-size:13px;min-height:38px}
+.tripMeta{font-family:Inter,sans-serif;font-size:12px;color:var(--muted);width:100%;padding-top:2px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:10px 18px 12px;scrollbar-width:thin;justify-content:flex-start;max-width:1240px;margin:auto;position:relative;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(90deg,#000 calc(100% - 30px),transparent);-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 30px),transparent)}
+.tabs.atEnd{mask-image:none;-webkit-mask-image:none}
+.tab{white-space:nowrap;border:1px solid #5b4b1e;background:#15151a;color:var(--text);padding:10px 14px;border-radius:999px;cursor:pointer;min-height:40px;font:inherit;font-family:Inter,sans-serif;font-size:14px;font-weight:500}
+.tab.active{background:linear-gradient(135deg,var(--gold2),#a9801f);color:#111;font-weight:800}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
+.wrap{max-width:1240px;margin:auto;padding:20px 18px 48px} .view{display:none;animation:fade .18s ease-out} .view.active{display:block} @keyframes fade{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:none}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px} .grid.tight{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card,.dayCard{background:linear-gradient(180deg,rgba(31,31,39,.96),rgba(20,20,26,.96));border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 18px 44px rgba(0,0,0,.24);margin:14px 0}
+.card.priority{border-left:5px solid var(--gold)} .muted{color:var(--muted);font-size:14px;font-family:Inter,sans-serif} .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid #5b4b1e;background:#28220f;color:#ffe58a;border-radius:999px;padding:5px 9px;font-size:12px;margin:2px;font-family:Inter,sans-serif;font-weight:500} .kpi{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-family:Inter,sans-serif;font-weight:500} .metric{font-size:30px;font-weight:700;color:var(--gold2);font-family:'Cormorant Garamond',serif}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;background:linear-gradient(135deg,var(--gold2),#96701d);color:#111;border-radius:12px;padding:10px 16px;margin:4px;cursor:pointer;font-weight:700;text-decoration:none;min-height:40px;font:inherit;font-family:Inter,sans-serif;font-size:14px;letter-spacing:.02em}
+.btn.secondary{background:#2a2a36;color:var(--text);border:1px solid #505060}
+body.brightmode .btn.secondary{background:#f0e8c8;color:#1a1a1a;border-color:#c8b878}
+.btn.ghost{background:transparent;color:var(--gold2);border:1px solid #5b4b1e} .btn.danger{background:#682830;color:white} button{font:inherit}
+input[type=text],input[type=password],input[type=email],input[type=url],input[type=tel],input[type=number],input[type=time],input[type=date],input[type=search],input:not([type]),textarea,select{width:100%;border:1px solid #424250;background:#0f0f14;color:var(--text);border-radius:12px;padding:11px;margin:7px 0 13px;font:inherit;font-family:Inter,sans-serif;font-size:15px}
+input[type=checkbox],input[type=radio]{width:auto;margin:0;flex-shrink:0}
+input[type=file]{width:100%;font-family:Inter,sans-serif;font-size:13px;margin:7px 0 13px}
+textarea{min-height:92px;resize:vertical}
+label{display:block;font-family:Inter,sans-serif;font-size:13px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:500;margin-top:8px}
+.pill label,.pill,label.pill,label.plain,.checklist label{text-transform:none;letter-spacing:0;font-weight:400;font-size:14px;color:var(--text);margin-top:0}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end}
+.split{display:grid;grid-template-columns:minmax(280px,1.2fr) minmax(260px,.8fr);gap:16px}
+.alert{border:1px solid #6d5519;background:#241d10;border-radius:14px;padding:12px;margin:10px 0;font-family:Inter,sans-serif;font-size:14px}
+.alert.ok{border-color:#25704f;background:#10251c} .alert.warn{border-color:#9b6425;background:#2a1d10} .alert.bad{border-color:#904141;background:#2a1212}
+.alert.ztl{border-color:var(--ztl);background:#2a1810;color:#ffd0a8}
+body.brightmode .alert{background:#fff7e0;border-color:#c8b878;color:#1a1a1a}
+body.brightmode .alert.ok{background:#e8f5ec;border-color:#7ac290;color:#1a4a2a}
+body.brightmode .alert.warn{background:#fff3d8;border-color:#d4a020;color:#5a3a00}
+body.brightmode .alert.bad{background:#fde0e0;border-color:#c47878;color:#5a1a1a}
+body.brightmode .alert.ztl{background:#ffead0;border-color:#d4742a;color:#5a2a00}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #4e4e5b;background:#111118;border-radius:999px;padding:7px 11px;margin:3px;text-decoration:none;color:var(--text);font-family:Inter,sans-serif;font-size:13px;cursor:pointer}
+.todayHero{background:linear-gradient(135deg,rgba(212,175,55,.22),rgba(23,23,30,.98));border:1px solid #7b6320}
+body.brightmode .todayHero{background:linear-gradient(135deg,rgba(212,175,55,.18),white);border-color:#c8a020}
+.timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+.step{background:#121219;border:1px solid #37311f;border-radius:16px;padding:13px} .step b{color:var(--gold2);font-family:Inter,sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:6px}
+body.brightmode .step b{color:#8b6b19}
+.dayTop{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;border-bottom:1px solid #342f20;padding-bottom:12px;margin-bottom:12px}
+.dayTitle{display:flex;gap:12px;align-items:flex-start;flex:1;min-width:0}
+.dayIcon{width:46px;height:46px;border-radius:14px;background:#2a230e;display:grid;place-items:center;font-size:25px;flex:0 0 auto}
+body.brightmode .dayIcon{background:#f5e8b8}
+.dayActions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.dayActions .pill{margin:0;flex:0 0 auto}
+.dayActions select{width:auto;min-width:130px;margin:0;padding:8px 10px}
+.itinerary{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:12px 0}
+.ibox{background:#111117;border:1px solid #36301f;border-radius:15px;padding:12px;min-height:118px}
+.ibox b{color:var(--gold2);font-family:Inter,sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:6px}
+body.brightmode .ibox b{color:#8b6b19}
+details{border:1px solid #383223;background:#121218;border-radius:15px;padding:10px 14px;margin:10px 0} summary{cursor:pointer;color:var(--gold2);font-weight:700;font-family:Inter,sans-serif;font-size:14px;letter-spacing:.04em;padding:4px 0}
+.photos{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px} .photos img{width:124px;height:92px;object-fit:cover;border-radius:14px;border:1px solid #555;cursor:pointer}
+.mapgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px} .mapPin{background:#131318;border:1px solid #383223;border-radius:18px;padding:15px}
+table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px;font-family:Inter,sans-serif;font-size:13px} td,th{border-bottom:1px solid #30303a;padding:9px;text-align:left} th{color:var(--gold2);font-weight:600;letter-spacing:.04em}
+body.brightmode th{color:#8b6b19} body.brightmode td,body.brightmode th{border-color:#d4c896}
+.weatherbox{min-height:135px} .exportPreview{max-height:520px;overflow:auto;background:#101014;border:1px solid #383223;border-radius:16px;padding:14px}
+body.brightmode .exportPreview{background:#fffdf3;border-color:#c8b878}
+.testrow{display:flex;gap:10px;align-items:flex-start;border-bottom:1px solid #30303a;padding:9px 0;font-family:Inter,sans-serif;font-size:14px} .testrow span:first-child{font-weight:900;font-size:16px;min-width:20px} .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+.empty{border:1px dashed #555;border-radius:16px;padding:16px;color:var(--muted);text-align:center;font-family:Inter,sans-serif}
+.saveStatus{position:fixed;bottom:18px;right:18px;background:rgba(20,20,26,.94);border:1px solid var(--line);color:var(--gold2);padding:8px 14px;border-radius:999px;font-family:Inter,sans-serif;font-size:13px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none;backdrop-filter:blur(8px)}
+.saveStatus.visible{opacity:1} .saveStatus.error{color:var(--bad);border-color:#904141}
+body.brightmode .saveStatus{background:rgba(255,255,255,.94);color:#8b6b19}
+.toast{position:fixed;bottom:60px;right:18px;background:rgba(20,20,26,.96);border:1px solid var(--line);color:var(--text);padding:12px 16px;border-radius:14px;font-family:Inter,sans-serif;font-size:14px;z-index:101;opacity:0;transition:all .3s;transform:translateY(10px);pointer-events:none;max-width:320px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.toast.visible{opacity:1;transform:none} .toast.ok{border-color:#25704f}.toast.warn{border-color:#9b6425}.toast.bad{border-color:#904141}
+body.brightmode .toast{background:white;color:#1a1a1a}
+.ztlBadge{display:inline-block;background:var(--ztl);color:#1a0f00;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:Inter,sans-serif;letter-spacing:.05em;margin-left:6px;text-transform:uppercase}
+.timeBadge{display:inline-block;background:#2a2a36;color:var(--gold2);padding:2px 7px;border-radius:6px;font-size:12px;font-family:'Courier New',monospace;margin-right:6px;font-weight:600}
+body.brightmode .timeBadge{background:#f0e8c8;color:#8b6b19}
+.searchBar{position:relative;margin:12px 0} .searchBar input{padding-left:38px} .searchBar::before{content:'⌕';position:absolute;left:14px;top:18px;color:var(--muted);font-size:18px;pointer-events:none}
+.checklist{font-family:Inter,sans-serif}
+.checklist label{display:flex;align-items:center;gap:8px;margin:6px 0;cursor:pointer}
+body.brightmode .checklist label{color:#1a1a1a}
+.checklist input[type=checkbox]{width:auto;margin:0;cursor:pointer}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.lightbox.visible{display:flex} .lightbox img{max-width:100%;max-height:90vh;border-radius:10px;box-shadow:0 12px 60px rgba(0,0,0,.6)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow-y:auto}
+.modal.visible{display:flex}
+.modalBox{background:linear-gradient(180deg,#1d1d24,#141419);border:1px solid var(--line);border-radius:22px;padding:24px;max-width:640px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+body.brightmode .modalBox{background:white;color:#1a1a1a}
+.modalClose{float:right;background:transparent;border:1px solid #5b4b1e;color:var(--gold2);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px}
+.templateCard{border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;cursor:pointer;background:#15151a;font-family:Inter,sans-serif;transition:all .15s}
+.templateCard:hover{border-color:var(--gold);background:#1d1d24}
+body.brightmode .templateCard{background:#fffdf3;border-color:#c8b878}
+.templateCard h3{margin:0 0 4px;font-size:18px}
+.templateCard p{margin:0;font-size:13px}
+@media(max-width:760px){
+  .hero{padding:12px 14px 6px;gap:10px} .heroText{text-align:left} .tripBar{padding:6px 12px 8px} .tabs{padding-left:12px} .wrap{padding:14px 12px 36px}
+  .split{grid-template-columns:1fr} .card,.dayCard{border-radius:18px;padding:14px} .dayTop{flex-direction:column;align-items:stretch}
+  .dayActions{margin-top:8px} .photos img{width:104px;height:78px} .itinerary,.timeline{grid-template-columns:1fr} body{font-size:16px} h1{font-size:22px}
+}
+@media print{
+  .appHeader,.tabs,.btn,input[type=file],#aiControls,.noPrint,.themeBtn,.saveStatus,.toast,.searchBar,.dayActions,#ai,#test,#diagnose,#trips,.tripBar,#aiControls,#balanceAdvice{display:none!important}
+  body{background:white!important;color:#111!important;font-size:11pt;font-family:Georgia,'Times New Roman',serif}
+  .wrap{max-width:none;padding:0}
+  .view{display:block!important;page-break-before:always} .view:first-of-type{page-break-before:auto}
+  .card,.dayCard,.step,.ibox,.mapPin,.todayHero,.alert{break-inside:avoid;page-break-inside:avoid;background:white!important;background-image:none!important;color:#111!important;border:1px solid #ccc!important;box-shadow:none!important}
+  h1,h2,h3,.step b,.ibox b{color:#8b6b19!important;font-family:'Cormorant Garamond',Georgia,serif!important}
+  a{color:#111;text-decoration:none} textarea,input,select{border:1px solid #bbb;background:white;color:#111}
+  .photos img{break-inside:avoid;max-width:140px;max-height:100px}
+  .badge,.timeBadge,.ztlBadge{border:1px solid #bbb!important;background:white!important;color:#5a4500!important}
+  .pill{background:white!important;border:1px solid #ccc!important;color:#111!important}
+  details{border:1px solid #ddd!important;background:white!important;color:#111!important}
+  details *{color:#111!important} .muted{color:#666!important}
+}
+</style>
+</head>
+<body>
+<header class="appHeader">
+  <div class="hero">
+    <div class="heroText">
+      <h1 id="appTitle">MOED Luxury Travel Companion</h1>
+      <p class="subtitle" id="appSubtitle">Persoonlijke reisplanner</p>
+    </div>
+    <div class="heroActions">
+      <button class="themeBtn" id="saveBtn" onclick="manualSave()" title="Handmatig opslaan" aria-label="Opslaan">💾</button>
+      <button class="themeBtn" id="themeBtn" onclick="toggleTheme()" title="Wissel licht/donker thema" aria-label="Wissel thema">☀</button>
+    </div>
+  </div>
+  <div class="tripBar">
+    <select class="tripSwitcher" id="tripSwitcher" onchange="switchTrip(this.value)" aria-label="Kies reis"></select>
+    <button class="btn" onclick="openNewTripModal()">+ Nieuwe reis</button>
+    <button class="btn secondary" onclick="showTab('trips')">Beheer</button>
+    <div class="tripMeta" id="tripMeta"></div>
+  </div>
+  <nav class="tabs" id="tabs" aria-label="Navigatie"></nav>
+  <div id="storageWarning" class="storageWarning" style="display:none"></div>
+</header>
+<main class="wrap">
+
+<section id="dashboard" class="view active">
+  <h2 id="dashboardTitle">Reisdashboard</h2>
+  <div class="grid tight">
+    <div class="card priority"><div class="kpi">Reisfilosofie</div><h3 id="philosophyTitle">—</h3><p id="philosophyText">—</p><div id="philosophyBadges"></div></div>
+    <div class="card"><div class="kpi">Voortgang</div><div class="metric" id="progressMetric">0/0</div><p class="muted">dagen afgerond</p><button class="btn secondary" onclick="showTab('planning')">Open planning</button></div>
+    <div class="card"><div class="kpi">Vandaag</div><div id="nextDay"></div><button class="btn" onclick="showTab('today')">Open vandaag-modus</button></div>
+    <div class="card"><div class="kpi">Back-up & opslag</div><p class="muted" id="storageInfo">Berekenen...</p><button class="btn" onclick="exportJSON()">Export reis</button><label class="btn secondary" style="cursor:pointer">Import reis<input type="file" accept="application/json" onchange="importJSON(event)" hidden></label><button class="btn secondary" onclick="window.print()">Print/PDF</button></div>
+  </div>
+  <div class="split">
+    <div><h2>Weer per locatie</h2><div id="weather" class="grid"></div></div>
+    <div><h2>Slimme balans</h2><div class="card"><div id="balanceAdvice" class="alert">Vul onderweg energie in per dag en klik op analyseren.</div><button class="btn" onclick="analyseBalance()">Analyseer vakantie-energie</button></div><div class="card"><h3>Reisstatus</h3><div id="qualityMini"></div></div></div>
+  </div>
+</section>
+
+<section id="today" class="view"><h2>Vandaag-modus</h2><div id="todayView"></div></section>
+
+<section id="planning" class="view">
+  <h2>Volledig reisschema</h2>
+  <p class="muted">Elke dag heeft een kernplan, planning per dagdeel, lunchsuggestie, verkeersadvies en eigen notities. Aanpassingen worden direct opgeslagen.</p>
+  <div class="searchBar"><input id="daySearch" placeholder="Zoek in dagen, titels of plannen..." oninput="filterDays(this.value)"></div>
+  <div class="row" style="margin-bottom:8px"><button class="btn secondary" onclick="expandAllDetails(true)">Alle details open</button><button class="btn secondary" onclick="expandAllDetails(false)">Alle details dicht</button><button class="btn secondary" onclick="jumpToToday()">Spring naar vandaag</button><button class="btn secondary" onclick="addNewDay()">+ Voeg dag toe</button></div>
+  <div id="days"></div>
+</section>
+
+<section id="checklist" class="view">
+  <h2>Vóór vertrek</h2>
+  <p class="muted">Praktische checklist voor deze reis. Vinkjes worden lokaal bewaard.</p>
+  <div id="checklistView"></div>
+  <div class="card">
+    <h3>Eigen checklist-item toevoegen</h3>
+    <div class="row">
+      <label>Categorie<select id="newCheckGroup"></select></label>
+      <label>Tekst<input id="newCheckText" placeholder="Bijv. Reisstekker meenemen"></label>
+    </div>
+    <button class="btn" onclick="addChecklistItem()">Toevoegen</button>
+  </div>
+</section>
+
+<section id="traffic" class="view">
+  <h2>Verkeer & live routes</h2>
+  <div class="alert warn"><b>Belangrijk:</b> actuele verkeersinformatie verandert continu. Deze tool opent daarom live routes in Google Maps. Check altijd vlak voor vertrek.</div>
+  <div id="trafficAlerts"></div>
+  <div id="trafficRoutes" class="grid"></div>
+  <div class="card"><h3>Verkeersnotities</h3><textarea id="trafficNotes" oninput="activeTrip().trafficNotes=this.value;debouncedSave()" placeholder="Bijv. drukte bij Milaan, betere lunchstop, alternatieve route..."></textarea></div>
+  <div class="card"><h3>AI-verkeersprompt</h3><textarea id="trafficPrompt" readonly></textarea><button class="btn" onclick="copyTrafficPrompt()">Kopieer prompt</button></div>
+</section>
+
+<section id="map" class="view"><h2>Kaartlaag</h2><div class="mapgrid" id="mapView"></div></section>
+
+<section id="reservations" class="view">
+  <h2>Reserveringen & reisbescheiden</h2>
+  <div class="split">
+    <div class="card"><h3>Nieuwe reservering</h3>
+      <label>Dag<select id="rDay"></select></label>
+      <label>Tijd<input id="rTime" type="time"></label>
+      <label>Duur (uur, optioneel)<input id="rDuration" type="number" step="0.5" min="0" placeholder="2"></label>
+      <label>Titel<input id="rTitle" placeholder="Hotel, restaurant, ticket, boottocht..."></label>
+      <label>Boekingsnummer<input id="rCode"></label>
+      <label>Contact/link<input id="rLink" placeholder="https://..."></label>
+      <label>Documenten<input id="rFiles" type="file" multiple></label>
+      <label>Notities<textarea id="rNotes"></textarea></label>
+      <button class="btn" onclick="addReservation()">Toevoegen</button>
+    </div>
+    <div><div id="resList"></div></div>
+  </div>
+</section>
+
+<section id="ai" class="view"><h2>AI Reisconcierge</h2><div class="alert warn">Voor privégebruik kun je een API-key lokaal invullen. De key blijft in deze browser en wordt niet meegenomen in JSON-export.</div><div class="card" id="aiControls"><label>Vraag aan de reisconcierge<textarea id="aiQuestion" placeholder="Bijv. We zijn moe en het wordt warm morgen. Wat is het slimste programma?"></textarea></label><div class="row"><label>Modus<select id="aiMode"><option value="copy">Alleen prompt kopiëren</option><option value="api">Live API gebruiken</option></select></label><label>Model<select id="aiModel"><option value="gpt-4o-mini">gpt-4o-mini (snel/goedkoop)</option><option value="gpt-4o">gpt-4o</option><option value="gpt-4.1-mini">gpt-4.1-mini</option></select></label><label>OpenAI API-key<input id="apiKey" type="password" placeholder="sk-..."></label></div><button class="btn" onclick="runAI()">Vraag advies</button><button class="btn secondary" onclick="copyAIContext()">Kopieer volledige context</button></div><div class="card"><h3>AI-uitkomst</h3><div id="aiResult" class="muted">Nog geen advies.</div></div></section>
+
+<section id="memory" class="view"><h2>Reisdagboek & foto's</h2><div class="card"><p>Dagverslagen en foto's worden lokaal in deze browser opgeslagen. Foto's worden automatisch gecomprimeerd tot ~1600px breed. Exporteren als JSON is verstandig als back-up.</p></div><div id="journal"></div></section>
+
+<section id="travelbook" class="view"><h2>Luxe reisboek export</h2><div class="split"><div class="card"><h3>Reisboek maken</h3><label>Intro<textarea id="bookIntro" oninput="activeTrip().bookIntro=this.value;debouncedSave()"></textarea></label><button class="btn" onclick="renderTravelBook()">Genereer preview</button><button class="btn secondary" onclick="printTravelBook()">Print reisboek / PDF</button></div><div class="card"><h3>Wat komt erin?</h3><ul style="font-family:Inter,sans-serif;font-size:14px;line-height:1.8"><li>Dagplanning</li><li>Eigen reisverslagen</li><li>Geüploade foto's</li><li>Hoogtepunten en herinneringen</li></ul></div></div><div id="travelBookPreview" class="exportPreview"></div></section>
+
+<section id="trips" class="view">
+  <h2>Reizen beheer</h2>
+  <p class="muted">Bekijk al je reizen, switch tussen ze, hernoem of verwijder.</p>
+  <button class="btn" onclick="openNewTripModal()">+ Nieuwe reis toevoegen</button>
+  <div id="tripsList"></div>
+</section>
+
+<section id="settings" class="view">
+  <h2>Reisinstellingen</h2>
+  <p class="muted">Pas reisnaam, datums, filosofie en locaties van de actieve reis aan.</p>
+  <div id="settingsView"></div>
+</section>
+
+<section id="diagnose" class="view">
+  <h2>Diagnose & opslag</h2>
+  <p class="muted">Controle of de tool jouw data goed bewaart.</p>
+  <div id="diagnoseView"></div>
+  <div class="card priority">
+    <h3>Handmatig opslaan</h3>
+    <button class="btn" onclick="manualSave()">Sla alles op</button>
+    <button class="btn secondary" onclick="testSaveRoundTrip()">Test schrijven & lezen</button>
+    <button class="btn secondary" onclick="exportJSON()">Download back-up</button>
+    <button class="btn secondary" onclick="exportAllTrips()">Export ALLE reizen</button>
+  </div>
+  <div class="card">
+    <h3>Resetten</h3>
+    <p class="muted">Wis alle data van deze browser. Maak eerst een JSON-export!</p>
+    <button class="btn danger" onclick="wipeStorage()">Wis lokale opslag</button>
+  </div>
+</section>
+
+<section id="test" class="view"><h2>Backtest & QA</h2><p class="muted">Geautomatiseerde controle van kernfuncties.</p><button class="btn" onclick="runBacktest()">Voer backtest uit</button><div id="testResults" class="card"></div></section>
+
+</main>
+
+<div id="saveStatus" class="saveStatus" role="status" aria-live="polite"></div>
+<div id="toast" class="toast" role="alert" aria-live="polite"></div>
+<div id="lightbox" class="lightbox" onclick="this.classList.remove('visible')"><img id="lightboxImg" alt=""></div>
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="modalBox" id="modalBox"></div></div>
+<script>
+// ============================================================
+// MOED Luxury Travel Companion v8 — multi-trip architecture
+// ============================================================
+
+// ============== TEMPLATES ==============
+
+// --- Italy 2026 template (the original trip, preserved verbatim) ---
+const ITALY_LOCS={
+  "montafon": {"name": "Falkensteiner Hotel Montafon", "area": "Tschagguns / Montafon, Vorarlberg", "lat": 47.0706, "lon": 9.9004, "icon": "🏔️"},
+  "piemonte": {"name": "Tenuta La Romana", "area": "Nizza Monferrato / Piemonte", "lat": 44.7749, "lon": 8.357, "icon": "🍇"},
+  "paradu": {"name": "Paradù Eco Lodge", "area": "Castagneto Carducci / Toscaanse kust", "lat": 43.1603, "lon": 10.5457, "icon": "🌊"},
+  "return": {"name": "Terugreis", "area": "Naar Nederland", "lat": 51.9244, "lon": 4.4777, "icon": "🚗"}
+};
+
+const ITALY_ROUTES=[
+  {"name": "Nederland → Montafon", "from": "Rotterdam", "to": "Falkensteiner Hotel Montafon Tschagguns", "dist":"~900 km","duration":"~9 uur"},
+  {"name": "Montafon → Tenuta La Romana", "from": "Falkensteiner Hotel Montafon Tschagguns", "to": "Tenuta La Romana Nizza Monferrato", "dist":"~580 km","duration":"~6,5 uur"},
+  {"name": "Tenuta La Romana → Paradù Eco Lodge", "from": "Tenuta La Romana Nizza Monferrato", "to": "Paradù Eco Lodge Castagneto Carducci", "dist":"~340 km","duration":"~4 uur"},
+  {"name": "Paradù → Nederland", "from": "Paradù Eco Lodge Castagneto Carducci", "to": "Rotterdam", "dist":"~1500 km","duration":"~15 uur"}
+];
+
+const ITALY_DAYS=[{"id":1,"date":"2026-07-18","title":"Aankomst Montafon","loc":"montafon","focus":"Reisdag & landen in de Alpen","plan":"Comfortabel reizen, inchecken en rustig landen. Geen ambitieus programma.","done":false,"energy":"","journal":"","photos":[],"morning":"Vertrek vroeg genoeg, maar maak van de rit geen race. Plan elke 2–2,5 uur een korte pauze.","lunch":"Kies bij voorkeur een lunch buiten een druk snelwegrestaurant; zoek rond Ulm/Bodensee/Vorarlberg naar een rustige Gasthof of See-terrasse.","afternoon":"Check-in, kamers verkennen, hotelrondje, eventueel kort zwemmen.","evening":"Eenvoudige maaltijd in hotel; vroeg slapen.","traffic":"Live files rond Duitsland/Oostenrijk checken; vergeet Vignette Oostenrijk niet (digitaal vooraf via asfinag.at).","ztl":false},{"id":2,"date":"2026-07-19","title":"Golm & Alpine Coaster","loc":"montafon","focus":"Eerste bergdag","plan":"Kabelbaan, uitzicht, Alpine Coaster, korte wandeling en hotelzwembad.","done":false,"energy":"","journal":"","photos":[],"morning":"Na ontbijt naar Golm. Begin met kabelbaan, daarna lichte wandeling.","lunch":"Berghut/panoramaterras bij Golm; kaiserschmarrn of simpele Alpenlunch.","afternoon":"Alpine Coaster, foto's en terug naar hotel voor zwembad/wellness.","evening":"Oostenrijkse klassieker: schnitzel/kaiserschmarrn.","traffic":"Vertrek rond 09:00 om parkeerdruk te vermijden.","ztl":false},{"id":3,"date":"2026-07-20","title":"Silvretta Hochalpenstraße","loc":"montafon","focus":"Wauwroute door de bergen","plan":"Vroeg op pad voor bergmeren, uitzichtpunten en lunch bij de Stausee.","done":false,"energy":"","journal":"","photos":[],"morning":"Vroeg richting Silvretta Hochalpenstraße voor rustig licht en minder verkeer.","lunch":"Picknick of lunch bij Silvretta Stausee; neem water/snacks mee.","afternoon":"Korte hike of relaxmoment aan het water; terugrit met fotostops.","evening":"Wellness- en herstelavond.","traffic":"Silvretta Hochalpenstraße is tolweg (~€20 retour). Controleer bergwegstatus en weer; bij onweer omwisselen met relaxdag.","ztl":false},{"id":4,"date":"2026-07-21","title":"Hochjoch familiedag","loc":"montafon","focus":"Actieve familiedag","plan":"Kabelbaan, panorama, speel-/waterzones en berglunch.","done":false,"energy":"","journal":"","photos":[],"morning":"Hochjoch of vergelijkbaar familiegebied: kabelbaan en panorama.","lunch":"Lunch vóór 12:30 in bergrestaurant; daarna wordt het drukker.","afternoon":"Adventure trail, waterzones, korte wandeling of activiteit voor kinderen.","evening":"Casual diner; niet te strak plannen.","traffic":"Kabelbanen vroeg bezoeken; parkeerdruk vermijden.","ztl":false},{"id":5,"date":"2026-07-22","title":"Relaxdag Montafon","loc":"montafon","focus":"Bewust vertragen","plan":"Laat ontbijt, wellness, zwembad, dorpje en apfelstrudel.","done":false,"energy":"","journal":"","photos":[],"morning":"Laat ontbijt en bewust geen grote verplaatsing.","lunch":"Lichte lunch in dorp/hotel; apfelstrudel-moment.","afternoon":"Zwembad, wellness, korte wandeling of terras.","evening":"Vrije avond, eventueel dorpje.","traffic":"Geen verkeersrisico; lokaal blijven.","ztl":false},{"id":6,"date":"2026-07-23","title":"Wauwdag Alpen","loc":"montafon","focus":"Memorabele bergervaring","plan":"Vroege bergervaring, brunch boven, mountain carts of bergmeer.","done":false,"energy":"","journal":"","photos":[],"morning":"Vroege bergervaring of panoramakabelbaan als wauw-moment.","lunch":"Brunch/lunch boven met uitzicht.","afternoon":"Mountain carts, bergmeer of rustige afdaling.","evening":"Mooie afsluitavond in Oostenrijkse sfeer.","traffic":"Vroeg starten voor licht, rust en parkeerplek.","ztl":false},{"id":7,"date":"2026-07-24","title":"Flexdag Montafon","loc":"montafon","focus":"Vrijheid & favoriete activiteit","plan":"Herhalen wat goed voelde of Liechtenstein/Bodensee als alternatief.","done":false,"energy":"","journal":"","photos":[],"morning":"Flexibel: favoriete activiteit opnieuw of rustige ochtend.","lunch":"Lunch afhankelijk van keuze: Bodensee/Liechtenstein/berghut/hotel.","afternoon":"Wellness, dorpje of korte uitstap.","evening":"Bagage licht voorbereiden voor reisdag.","traffic":"Controleer route naar Piemonte alvast; reken op Brennertol (~€10) of Reschenpass-route (geen tol, langer).","ztl":false},{"id":8,"date":"2026-07-25","title":"Reisdag naar Piemonte","loc":"piemonte","focus":"Van Alpen naar wijnland","plan":"Mooie route, lunchstop onderweg en aankomst in Italiaanse sfeer.","done":false,"energy":"","journal":"","photos":[],"morning":"Vertrek niet te laat; lange route met landschapswisseling.","lunch":"Plan lunch aan een Italiaans/Zwitsers meer of mooie stop buiten snelweg.","afternoon":"Aankomst Tenuta La Romana, rustig inchecken, zwembad.","evening":"Eerste Italiaanse dineravond.","traffic":"Zaterdagdrukte vermijden; live route checken vóór vertrek. Italiaanse autostrade: tolpoorten met kaart/cash.","ztl":false},{"id":9,"date":"2026-07-26","title":"La Dolce Vita aankomstdag","loc":"piemonte","focus":"Zwembad & eerste dorpje","plan":"Rustig starten, zwembad, gelato en eerste Italiaanse dineravond.","done":false,"energy":"","journal":"","photos":[],"morning":"Rustig ontbijt; geen zware activiteit.","lunch":"Lunch bij Tenuta of eenvoudig lokaal adres.","afternoon":"Zwembad, eerste dorpje, gelato.","evening":"Aperitivo en lange dineravond.","traffic":"Lokaal verkeer rustig; let op siëstatijden (13:00–16:00 veel gesloten).","ztl":false},{"id":10,"date":"2026-07-27","title":"Barolo · La Morra · Monforte","loc":"piemonte","focus":"Dorpjesroute Piemonte","plan":"Wijngaarden, uitzichtpunten, dorpjes, trattoria en gelato.","done":false,"energy":"","journal":"","photos":[],"morning":"Start richting Barolo/La Morra vóór grootste warmte (vertrek ~9:00).","lunch":"Trattoria tussen wijngaarden — reserveer indien mogelijk. Tip: Bovio in La Morra (uitzicht) of Trattoria della Posta (Monforte).","afternoon":"Monforte d'Alba, uitzichtpunten bij La Morra (Belvedere), gelato in Barolo zelf.","evening":"Terug naar Tenuta of diner in dorp.","traffic":"Kleine wegen; parkeren bij dorpjes vóór 11:00 of na 15:00. Geen ZTL in Barolo-dorpjes, wel beperkt parkeren.","ztl":false},{"id":11,"date":"2026-07-28","title":"Relaxdag Piemonte","loc":"piemonte","focus":"Zwembad & slow living","plan":"Geen grote planning; genieten van Tenuta, lunch en rust.","done":false,"energy":"","journal":"","photos":[],"morning":"Geen planning; langzaam starten.","lunch":"Lunch aan zwembad of lokale agriturismo.","afternoon":"Lezen, zwemmen, niets moeten.","evening":"Eenvoudige avond, eventueel wijnmoment ouders.","traffic":"Geen route nodig.","ztl":false},{"id":12,"date":"2026-07-29","title":"Hidden gem Piemonte","loc":"piemonte","focus":"Lokale ontdekdag","plan":"Kleine dorpjes, lokale trattoria, wijnlandschap en uitzichtpunten.","done":false,"energy":"","journal":"","photos":[],"morning":"Hidden gem route door Monferrato: kleine dorpjes en uitzichtpunten zoals Calosso, Castagnole delle Lanze, Neive.","lunch":"Lokale trattoria; vraag naar dagspecials (menu del giorno).","afternoon":"Korte stops, foto's en gelato.","evening":"Rustig terug.","traffic":"Gebruik Google Maps live voor kleine wegen; vermijd te veel stops bij hitte.","ztl":false},{"id":13,"date":"2026-07-30","title":"Turijn of slow Piemonte","loc":"piemonte","focus":"Stad of vertragen","plan":"Keuze tussen Turijn-dagtrip of luxe rustige dag in Monferrato.","done":false,"energy":"","journal":"","photos":[],"morning":"Keuze: Turijn vroeg (vertrek 8:00) of slow day.","lunch":"Turijn: markthal (Mercato Centrale) of café aan Piazza Castello; slow day: lokale lunch met uitzicht.","afternoon":"Turijn: Museo Egizio, Mole Antonelliana of shoppen onder de portici. Of zwembad.","evening":"Avond afhankelijk van energie.","traffic":"⚠ Turijn heeft uitgebreide ZTL Centrale Storico (ma-vr 7:30–10:30). Parkeer bij Porta Susa of Caio Mario en neem metro. Bij hitte (>32°C) slow day kiezen.","ztl":true},{"id":14,"date":"2026-07-31","title":"Laatste avond Piemonte","loc":"piemonte","focus":"Afscheidsdiner wijnland","plan":"Rustig overdag, bijzondere avond met zonsondergang en goed eten.","done":false,"energy":"","journal":"","photos":[],"morning":"Rustig programma; laatste dag Piemonte niet volproppen.","lunch":"Mooie lunchplek met uitzicht of bij wijnhuis (agriturismo).","afternoon":"Zwembad, inpakken, laatste dorpje.","evening":"Bijzonder afscheidsdiner — reserveer vandaag of een dag eerder.","traffic":"Reserveer diner vooraf.","ztl":false},{"id":15,"date":"2026-08-01","title":"Reisdag naar Toscaanse kust","loc":"paradu","focus":"Naar zee","plan":"Vertrek richting Paradù, lunchstop en eerste strandwandeling.","done":false,"energy":"","journal":"","photos":[],"morning":"Vertrek richting Toscaanse kust; niet haasten.","lunch":"Lunchstop onderweg, bij voorkeur rond Ligurië/Toscane buiten snelweg (Sarzana, Pietrasanta).","afternoon":"Aankomst Paradù, strandwandeling, lodge verkennen.","evening":"Voeten in zand, eenvoudige strandavond.","traffic":"Zaterdagdrukte richting kust; vertrek vóór 9:00. Live route checken.","ztl":false},{"id":16,"date":"2026-08-02","title":"Volledige stranddag","loc":"paradu","focus":"Zee, zand & niets moeten","plan":"Beach day: zwemmen, lezen, spelen, strandtent en zonsondergang.","done":false,"energy":"","journal":"","photos":[],"morning":"Vroege strandplek vóór drukte (8:30–9:00 op het strand).","lunch":"Beachclub/strandbar met pasta, salade of vis.","afternoon":"Zwemmen, lezen, spelen; siësta.","evening":"Zonsondergang aan zee.","traffic":"Geen route; parkeer/stranddruk vermijden door vroeg te gaan.","ztl":false},{"id":17,"date":"2026-08-03","title":"Bolgheri & Castagneto Carducci","loc":"paradu","focus":"Toscaanse kustroute","plan":"Strand in de ochtend, dorpjes en cipressenlaan in de middag.","done":false,"energy":"","journal":"","photos":[],"morning":"Strand in ochtend, daarna richting Bolgheri.","lunch":"Lunch in Bolgheri of Castagneto Carducci; reserveer terras (Osteria Magona Bolgheri, Da Ugo Castagneto).","afternoon":"Cipressenlaan (Viale dei Cipressi), dorpjes, gelato, uitzicht.","evening":"Terug naar kust voor sunset.","traffic":"⚠ Bolgheri en Castagneto Carducci hebben ZTL in het oude centrum. Parkeer altijd in de daarvoor aangewezen parkings buiten de muren — borden 'P' volgen. Niet rijden bij borden met witte ring + rode streep.","ztl":true},{"id":18,"date":"2026-08-04","title":"Waterdag Toscane","loc":"paradu","focus":"Boot, SUP of snorkelen","plan":"Zee-activiteit, lunch aan water en relaxte avond.","done":false,"energy":"","journal":"","photos":[],"morning":"Wateractiviteit plannen: boot, SUP, snorkelen of kajak (boek 1 dag vooraf).","lunch":"Lunch aan het water; licht houden.","afternoon":"Relaxen na wateractiviteit.","evening":"Diner aan zee of lodge.","traffic":"Check wind/zee voor wateractiviteit; bij veel wind vervangen door dorpjesdag.","ztl":false},{"id":19,"date":"2026-08-05","title":"Relaxdag aan zee","loc":"paradu","focus":"Vakantieflow","plan":"Strand, zwembad, siësta, eenvoudige lunch en geen druk.","done":false,"energy":"","journal":"","photos":[],"morning":"Laat ontbijt, strand zonder schema.","lunch":"Eenvoudige lunch bij strandtent.","afternoon":"Zwembad/strand/siësta.","evening":"Spontaan diner.","traffic":"Geen verkeersplanning.","ztl":false},{"id":20,"date":"2026-08-06","title":"Lucca of Toscaanse uitstap","loc":"paradu","focus":"Grote uitstapdag","plan":"Lucca als gezinsvriendelijke keuze; alternatief Pisa/Volterra.","done":false,"energy":"","journal":"","photos":[],"morning":"Vroeg naar Lucca als familievriendelijke keuze (vertrek ~8:30).","lunch":"Lunch binnen de stadsmuren; zoek schaduwterras (Piazza Anfiteatro).","afternoon":"Fietsen over stadsmuur (huur bij Poggio's of Cicli Bizzarri, ~€4/uur) of rustig slenteren.","evening":"Terug en eenvoudige avond.","traffic":"⚠ Lucca-centrum is volledig ZTL — niet inrijden! Parkeer bij Parcheggio Carducci, Cittadella of Palatucci (€1,50/uur). Vanaf parking 5–10 min lopen naar de stadsmuren.","ztl":true},{"id":21,"date":"2026-08-07","title":"Laatste volle stranddag","loc":"paradu","focus":"Nog één keer zee","plan":"Rustige stranddag, favoriete plek opnieuw en mooi diner.","done":false,"energy":"","journal":"","photos":[],"morning":"Nog één keer favoriete strandmoment.","lunch":"Beachclub of picknicklunch.","afternoon":"Zwemmen, foto's, herinneringen verzamelen.","evening":"Mooie laatste stranddineravond.","traffic":"Geen route behalve lokale stranddrukte.","ztl":false},{"id":22,"date":"2026-08-08","title":"Bonusdag Toscane","loc":"paradu","focus":"Vrije keuze","plan":"Favoriete strand, shopping, extra dorpje of spontane afsluiting.","done":false,"energy":"","journal":"","photos":[],"morning":"Vrije keuze op basis van energie.","lunch":"Herhaal favoriete lunchplek of ontdek laatste lokaal adres.","afternoon":"Shopping, strand of extra dorpje.","evening":"Rustige afsluiting; alvast inpakken. Reserveer onderweg-hotel als 1-nacht-tussenstop nodig is.","traffic":"Check terugreisroute en files.","ztl":false},{"id":23,"date":"2026-08-09","title":"Terugreis","loc":"return","focus":"Naar huis","plan":"Rustig vertrek, live route checken en goede pauzes plannen.","done":false,"energy":"","journal":"","photos":[],"morning":"Rustig vertrekken; route live bepalen. Reken op 14–15 uur rijden — overweeg overnachting onderweg (Gardameer/Zwitserland).","lunch":"Plan lunch en lange pauzes onderweg.","afternoon":"Rit in blokken, kinderen afwisselend laten kiezen voor stops.","evening":"Aankomst thuis; reisboek later aanvullen.","traffic":"Gebruik Google Maps/Waze voor actuele files en alternatieven. Vermijd Brennertol-piek op zondagavond.","ztl":false}];
+
+const ITALY_CHECKLIST=[
+  {title:"Documenten (vóór vertrek)",items:["Paspoorten alle gezinsleden geldig tot na 9 augustus 2026","Kopieën paspoorten digitaal én op papier","EHIC-kaarten (Europese verzekeringskaart) voor iedereen","Reisverzekeringspas + 24u-noodnummer","Internationaal rijbewijs (Italië accepteert NL-rijbewijs, niet verplicht)","Groene kaart auto (autoverzekering buitenland)","Reservering bevestigingen geprint + digitaal","Notarissen/contactpersonen thuis bereikbaar (lijst)"]},
+  {title:"Auto & onderweg",items:["APK & onderhoud auto recent","Vignette Oostenrijk gekocht (digitaal asfinag.at, ~€12,40)","Reservewiel/bandenreparatieset gecheckt","Veiligheidshesjes (verplicht in Italië/Oostenrijk) — 1 per persoon","Gevarendriehoek","EHBO-kit","Reservelampen autolampen (verplicht in Italië)","Tankpas of cash voor tol","Lader voor telefoon in auto (USB-C + Lightning indien nodig)","Koelbox + waterflessen"]},
+  {title:"Gezondheid",items:["Eigen medicatie ruim op voorraad","Kinder-pijnstillers/koortsremmer","Pleisters, desinfectans, klamboe-stick","Zonnebrand SPF 50+ (kinderen) en SPF 30 (volwassenen)","Aftersun","Anti-mug spray + after-bite","Reisziekte-tabletjes (bergroutes)","Maagklachten-medicatie","Mondmaskers (voor het geval ergens nodig)"]},
+  {title:"Praktisch",items:["Cash €300–500 mee voor eerste dagen (tol, parkeren, kleine zaken)","Twee creditcards op verschillende plekken bewaren","Mobiel data-bundel buitenland geactiveerd","Powerbank","Universele EU-stekker (niet nodig voor NL→AT/IT, wel handig)","Verrekijker (bergen)","Snorkelset/zwemvleugels kinderen","Wandelschoenen + slippers + sneakers","Lichte regenjas (bergen)","Boek/spelletjes voor kinderen in de auto","Snacks voor onderweg"]},
+  {title:"Thuis voorbereiden",items:["Thuis: planten verzorging geregeld","Post/pakketten doorgestuurd of opgevangen","Buren ingelicht","Verwarming/airco op vakantiestand","Wasmachine waterkraan dicht","Koelkast netjes (geen bederfelijk eten)","Sleutel bij buur/familie","Smart home (Homey) vakantiemodus actief","Camera's/sensoren actief","Verlichting op timer of automatisering"]}
+];
+
+// --- Generic templates ---
+const TEMPLATES={
+  italy2026:{
+    label:"Italië roadtrip 2026 (volledige reis)",
+    description:"De complete Oostenrijk + Piemonte + Toscaanse kust reis (18 juli – 9 augustus 2026, 23 dagen).",
+    icon:"🇮🇹",
+    build:()=>({
+      name:"Italië roadtrip 2026",
+      startDate:"2026-07-18",
+      endDate:"2026-08-09",
+      philosophy:{title:"Structuur waar nodig, vrijheid waar het kan",text:"Alpenavontuur, Italiaanse vertraging en strandafsluiting — met ruimte voor weer, energie en spontane ontdekkingen.",badges:["Actie","Rust","Hidden gems","Gezin"]},
+      bookIntro:"Onze gezinsreis door Oostenrijk, Piemonte en de Toscaanse kust: bergen, wijnlandschappen, zee, vrijheid en herinneringen.",
+      locations:JSON.parse(JSON.stringify(ITALY_LOCS)),
+      routes:JSON.parse(JSON.stringify(ITALY_ROUTES)),
+      days:JSON.parse(JSON.stringify(ITALY_DAYS)),
+      checklistGroups:JSON.parse(JSON.stringify(ITALY_CHECKLIST)),
+      reservations:[],weather:{},trafficNotes:'',checklist:{}
+    })
+  },
+  roadtrip:{
+    label:"Auto-roadtrip (leeg)",
+    description:"Voor een reis met de auto door Europa. Bevat EU-auto checklist (vignettes, hesjes, tol).",
+    icon:"🚗",
+    build:()=>({
+      name:"Nieuwe roadtrip",
+      startDate:new Date().toISOString().slice(0,10),
+      endDate:new Date(Date.now()+7*86400000).toISOString().slice(0,10),
+      philosophy:{title:"Onderweg is de bestemming",text:"Een roadtrip met ruimte voor onverwachte stops, lokale ontdekkingen en flexibiliteit.",badges:["Roadtrip","Vrijheid","Ontdekken"]},
+      bookIntro:"Onze roadtrip door Europa.",
+      locations:{
+        start:{name:"Startpunt",area:"Vul aan",lat:52.0,lon:5.0,icon:"🏠"},
+        return:{name:"Terugreis",area:"Naar huis",lat:52.0,lon:5.0,icon:"🚗"}
+      },
+      routes:[],
+      days:generateEmptyDays(new Date().toISOString().slice(0,10),7,"start"),
+      checklistGroups:[
+        {title:"Documenten",items:["Paspoorten/ID-kaarten geldig","Rijbewijs","Groene kaart auto","EHIC-kaarten","Reisverzekering polis","Hotelreserveringen geprint"]},
+        {title:"Auto & vignettes",items:["APK & onderhoud auto recent","Vignette landen onderweg (AT/CH/SI/CZ — check)","Reservewiel/repair kit","Veiligheidshesjes — 1 per persoon","Gevarendriehoek","EHBO-kit","Reservelampen","Cash voor tol","Telefoonlader in auto"]},
+        {title:"Gezondheid",items:["Eigen medicatie","Pleisters & desinfectans","Zonnebrand","Anti-mug spray","Reisziekte-tabletten"]},
+        {title:"Praktisch",items:["Cash voor eerste dagen","Powerbank","Adapter stopcontact (indien nodig)","Wandelschoenen","Regenjas","Snacks onderweg"]},
+        {title:"Thuis voorbereiden",items:["Planten/huisdieren","Post","Buren ingelicht","Verwarming op vakantiestand","Smart home vakantiemodus"]}
+      ],
+      reservations:[],weather:{},trafficNotes:'',checklist:{}
+    })
+  },
+  citytrip:{
+    label:"Stedentrip (vliegtuig)",
+    description:"Kort verblijf in één stad. Bevat vliegtuig-checklist (handbagage, tickets, hotel).",
+    icon:"✈️",
+    build:()=>({
+      name:"Nieuwe stedentrip",
+      startDate:new Date().toISOString().slice(0,10),
+      endDate:new Date(Date.now()+3*86400000).toISOString().slice(0,10),
+      philosophy:{title:"Stad ontdekken op je eigen tempo",text:"Een korte, geconcentreerde stedentrip met hoogtepunten en eigen ontdekkingen.",badges:["Cultuur","Stad","Kort"]},
+      bookIntro:"Onze stedentrip.",
+      locations:{
+        city:{name:"Stad",area:"Vul aan",lat:48.85,lon:2.35,icon:"🏛️"}
+      },
+      routes:[],
+      days:generateEmptyDays(new Date().toISOString().slice(0,10),3,"city"),
+      checklistGroups:[
+        {title:"Documenten",items:["Paspoort/ID geldig","Boarding pass / tickets","Hotelreservering","EHIC-kaart","Reisverzekering","Foto van paspoort op telefoon"]},
+        {title:"Handbagage vliegtuig",items:["Vloeistoffen max 100ml in zipperbag","Powerbank in handbagage (niet ruim!)","Laptop/tablet apart bij security","Medicijnen + recept","Sleutels thuis","Wallet + 2 kaarten op verschillende plekken"]},
+        {title:"Praktisch",items:["Cash lokale valuta","Adapter stopcontact (indien nodig)","Comfortabele wandelschoenen","Lichte regenjas","Daypack","Telefoonlader","Hoofdtelefoon vliegtuig"]},
+        {title:"Thuis voorbereiden",items:["Verwarming uit","Vuilnis buiten","Apparaten uit","Sleutel bij buur","Smart home vakantiemodus"]}
+      ],
+      reservations:[],weather:{},trafficNotes:'',checklist:{}
+    })
+  },
+  beach:{
+    label:"Strandvakantie",
+    description:"Rustige zon-zee-strandreis. Gezinsvriendelijke checklist.",
+    icon:"🌊",
+    build:()=>({
+      name:"Nieuwe strandvakantie",
+      startDate:new Date().toISOString().slice(0,10),
+      endDate:new Date(Date.now()+10*86400000).toISOString().slice(0,10),
+      philosophy:{title:"Zee, zand en niets moeten",text:"Vakantie als bedoeld: bewust vertragen, lange dagen aan zee, lokale tavernes.",badges:["Strand","Rust","Gezin"]},
+      bookIntro:"Onze strandvakantie.",
+      locations:{
+        resort:{name:"Resort",area:"Vul aan",lat:36.5,lon:25.0,icon:"🌊"}
+      },
+      routes:[],
+      days:generateEmptyDays(new Date().toISOString().slice(0,10),10,"resort"),
+      checklistGroups:[
+        {title:"Documenten",items:["Paspoorten/ID","Tickets/transferbevestiging","Hotelreservering","EHIC","Reisverzekering"]},
+        {title:"Strand & zwembad",items:["Zonnebrand SPF 50+ kinderen","Zonnebrand SPF 30+ volwassen","Aftersun","Zwemkleding × 2","Strandhanddoeken","Snorkelset","Zwemvleugels/bandjes","Strandtas","Waterschoenen","Speelgoed strand","Zonnebril","Hoeden/petten"]},
+        {title:"Gezondheid",items:["Pleisters waterproof","Antihistaminica (kwallen/insectenbeten)","Anti-mug spray","Maagklachten-medicatie","Eigen medicatie","Mondmaskers"]},
+        {title:"Praktisch",items:["Cash lokale valuta","Adapter","Powerbank","Boeken/e-reader","Spelletjes regenmoment","Slippers + sandalen + sneakers","Lichte avondkleding"]},
+        {title:"Thuis voorbereiden",items:["Planten","Buren","Vakantiemodus huis","Post","Auto/garage"]}
+      ],
+      reservations:[],weather:{},trafficNotes:'',checklist:{}
+    })
+  },
+  blank:{
+    label:"Volledig leeg",
+    description:"Van scratch beginnen. Geen voorgevulde data.",
+    icon:"📝",
+    build:()=>({
+      name:"Nieuwe reis",
+      startDate:new Date().toISOString().slice(0,10),
+      endDate:new Date(Date.now()+6*86400000).toISOString().slice(0,10),
+      philosophy:{title:"Mijn reis",text:"Vul je eigen reisfilosofie in.",badges:[]},
+      bookIntro:"Mijn reis.",
+      locations:{base:{name:"Bestemming",area:"Vul aan",lat:52.0,lon:5.0,icon:"📍"}},
+      routes:[],
+      days:generateEmptyDays(new Date().toISOString().slice(0,10),7,"base"),
+      checklistGroups:[
+        {title:"Documenten",items:["Paspoort/ID","Tickets","Reservering","Verzekering"]},
+        {title:"Bagage",items:["Kleding","Schoenen","Toilettas","Telefoonlader"]},
+        {title:"Thuis",items:["Sleutel","Planten","Post"]}
+      ],
+      reservations:[],weather:{},trafficNotes:'',checklist:{}
+    })
+  }
+};
+
+function generateEmptyDays(startDate,count,defaultLoc){
+  const days=[];
+  const start=new Date(startDate);
+  for(let i=0;i<count;i++){
+    const d=new Date(start);
+    d.setDate(d.getDate()+i);
+    days.push({
+      id:i+1,date:d.toISOString().slice(0,10),
+      title:`Dag ${i+1}`,loc:defaultLoc,
+      focus:"Vul focus in",plan:"Vul plan in",
+      done:false,energy:"",journal:"",photos:[],
+      morning:"",lunch:"",afternoon:"",evening:"",traffic:"",ztl:false
+    });
+  }
+  return days;
+}
+// ============== STATE MANAGEMENT ==============
+const STORE='moed_travel_companion_v8';
+const $=id=>document.getElementById(id);
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function genId(){return 't_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
+
+function initialState(){
+  const italyTrip=TEMPLATES.italy2026.build();
+  const italyId='italy2026';
+  return {
+    trips:{[italyId]:{id:italyId,...italyTrip,createdAt:new Date().toISOString()}},
+    activeTripId:italyId,
+    theme:'dark',
+    version:'v8'
+  };
+}
+
+function migrateFromV7(v7state){
+  // v7state had {days, reservations, weather, trafficNotes, checklist, bookIntro, theme}
+  // Convert to a single Italy trip
+  const tripId='italy2026_migrated';
+  const italyBase=TEMPLATES.italy2026.build();
+  // Migrate user's days into new structure (preserving their edits)
+  const migratedDays=(v7state.days||italyBase.days).map((d,i)=>{
+    const baseDay=italyBase.days[i]||{};
+    return {...baseDay,...d,id:i+1,photos:d.photos||[]};
+  });
+  return {
+    trips:{[tripId]:{
+      id:tripId,
+      ...italyBase,
+      days:migratedDays,
+      reservations:v7state.reservations||[],
+      weather:v7state.weather||{},
+      trafficNotes:v7state.trafficNotes||'',
+      checklist:v7state.checklist||{},
+      bookIntro:v7state.bookIntro||italyBase.bookIntro,
+      createdAt:new Date().toISOString()
+    }},
+    activeTripId:tripId,
+    theme:v7state.theme||'dark',
+    version:'v8'
+  };
+}
+
+function loadState(){
+  try{
+    // Try v8 first
+    let raw=localStorage.getItem(STORE);
+    if(raw){
+      const s=JSON.parse(raw);
+      if(s.version==='v8'&&s.trips&&s.activeTripId)return normalizeState(s);
+    }
+    // Migrate from v7/v6
+    const v7raw=localStorage.getItem('moed_travel_companion_v7')||localStorage.getItem('moed_travel_companion_v6');
+    if(v7raw){
+      const v7=JSON.parse(v7raw);
+      const migrated=migrateFromV7(v7);
+      // Don't auto-save yet — wait for first save
+      return normalizeState(migrated);
+    }
+    return initialState();
+  }catch(e){console.warn('loadState failed:',e);return initialState()}
+}
+
+function normalizeState(s){
+  s.trips=s.trips||{};
+  Object.keys(s.trips).forEach(id=>{
+    const t=s.trips[id];
+    t.id=t.id||id;
+    t.name=t.name||'Naamloze reis';
+    t.days=(t.days||[]).map((d,i)=>({...d,id:i+1,photos:d.photos||[]}));
+    t.locations=t.locations||{};
+    t.routes=t.routes||[];
+    t.checklistGroups=t.checklistGroups||[];
+    t.reservations=(t.reservations||[]).map(r=>({...r,time:r.time||'',duration:r.duration||''}));
+    t.weather=t.weather||{};
+    t.trafficNotes=t.trafficNotes||'';
+    t.checklist=t.checklist||{};
+    t.philosophy=t.philosophy||{title:'Mijn reis',text:'',badges:[]};
+    t.bookIntro=t.bookIntro||'';
+  });
+  if(!s.activeTripId||!s.trips[s.activeTripId]){
+    s.activeTripId=Object.keys(s.trips)[0];
+  }
+  s.theme=s.theme||'dark';
+  s.version='v8';
+  return s;
+}
+
+let state=loadState();
+function activeTrip(){return state.trips[state.activeTripId]}
+
+// ============== SAVE / FEEDBACK ==============
+let saveTimer=null;
+function showSaveStatus(text,isError){
+  const el=$('saveStatus');
+  el.textContent=text;
+  el.classList.toggle('error',!!isError);
+  el.classList.add('visible');
+  clearTimeout(showSaveStatus._t);
+  showSaveStatus._t=setTimeout(()=>el.classList.remove('visible'),1800);
+}
+function toast(text,type){
+  const el=$('toast');
+  el.textContent=text;
+  el.className='toast '+(type||'ok');
+  el.classList.add('visible');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>el.classList.remove('visible'),3500);
+}
+function saveOnly(){
+  try{
+    localStorage.setItem(STORE,JSON.stringify(state));
+    showSaveStatus('✓ Opgeslagen');
+    updateStorageInfo();
+    return true;
+  }catch(e){
+    if(e.name==='QuotaExceededError'||e.code===22){
+      toast('⚠ Lokale opslag vol. Exporteer als JSON en verwijder eventueel oude foto\'s.','bad');
+      showSaveStatus('✗ Opslag vol',true);
+    }else{
+      toast('Opslaan mislukt: '+e.message,'bad');
+      showSaveStatus('✗ Fout',true);
+    }
+    return false;
+  }
+}
+function save(render=true){saveOnly();if(render)renderAll();}
+function debouncedSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveOnly(),400);}
+function manualSave(){if(saveOnly())toast('✓ Alle data opgeslagen in deze browser.','ok');}
+
+function updateStorageInfo(){
+  try{
+    const used=new Blob([JSON.stringify(state)]).size;
+    const mb=(used/1024/1024).toFixed(2);
+    const trips=Object.keys(state.trips).length;
+    const photos=Object.values(state.trips).reduce((a,t)=>a+t.days.reduce((b,d)=>b+(d.photos||[]).length,0),0);
+    if($('storageInfo'))$('storageInfo').innerHTML=`<span class="muted">${mb} MB · ${trips} reis(zen) · ${photos} foto's<br>Maak regelmatig een JSON-back-up.</span>`;
+  }catch(e){}
+}
+
+// ============== TRIP SWITCHING ==============
+function switchTrip(tripId){
+  if(!state.trips[tripId])return;
+  state.activeTripId=tripId;
+  saveOnly();
+  renderAll();
+  showTab('dashboard');
+  toast(`Gewisseld naar: ${state.trips[tripId].name}`,'ok');
+}
+
+function openNewTripModal(){
+  const html=`
+    <button class="modalClose" onclick="closeModal()" aria-label="Sluit">×</button>
+    <h2>Nieuwe reis</h2>
+    <p class="muted">Kies een template als startpunt. Je kunt daarna alles aanpassen.</p>
+    <div>${Object.entries(TEMPLATES).map(([key,t])=>`
+      <div class="templateCard" onclick="createTripFromTemplate('${key}')">
+        <h3>${t.icon} ${esc(t.label)}</h3>
+        <p class="muted">${esc(t.description)}</p>
+      </div>`).join('')}
+    </div>`;
+  $('modalBox').innerHTML=html;
+  $('modal').classList.add('visible');
+}
+function closeModal(){$('modal').classList.remove('visible')}
+
+function createTripFromTemplate(templateKey){
+  const tpl=TEMPLATES[templateKey];
+  if(!tpl)return;
+  const id=genId();
+  const trip={id,...tpl.build(),createdAt:new Date().toISOString()};
+  // For italy template, give a unique name if it's the second instance
+  if(templateKey==='italy2026'&&Object.values(state.trips).some(t=>t.name.includes('Italië roadtrip 2026'))){
+    trip.name='Italië roadtrip 2026 (kopie)';
+  }
+  state.trips[id]=trip;
+  state.activeTripId=id;
+  closeModal();
+  save();
+  showTab('settings');
+  toast(`✓ Reis "${trip.name}" aangemaakt. Pas details aan in Instellingen.`,'ok');
+}
+
+function deleteTrip(tripId){
+  const trip=state.trips[tripId];
+  if(!trip)return;
+  if(!confirm(`Reis "${trip.name}" volledig verwijderen? Dit kan niet ongedaan worden gemaakt.`))return;
+  if(!confirm(`Maak eerst een JSON-export als back-up. Klik OK om door te gaan met verwijderen.`))return;
+  delete state.trips[tripId];
+  if(state.activeTripId===tripId){
+    state.activeTripId=Object.keys(state.trips)[0];
+    if(!state.activeTripId){
+      // No trips left — recreate the Italy template
+      const newTrip=TEMPLATES.italy2026.build();
+      const newId='italy2026';
+      state.trips[newId]={id:newId,...newTrip,createdAt:new Date().toISOString()};
+      state.activeTripId=newId;
+    }
+  }
+  save();
+  toast('✓ Reis verwijderd','ok');
+}
+
+function renameTrip(tripId){
+  const trip=state.trips[tripId];
+  if(!trip)return;
+  const newName=prompt('Nieuwe naam voor deze reis:',trip.name);
+  if(newName&&newName.trim()){
+    trip.name=newName.trim();
+    save();
+    toast('✓ Hernoemd','ok');
+  }
+}
+
+function duplicateTrip(tripId){
+  const trip=state.trips[tripId];
+  if(!trip)return;
+  const id=genId();
+  const copy=clone(trip);
+  copy.id=id;
+  copy.name=trip.name+' (kopie)';
+  copy.createdAt=new Date().toISOString();
+  state.trips[id]=copy;
+  save();
+  toast('✓ Reis gedupliceerd','ok');
+}
+
+function renderTripSwitcher(){
+  const sw=$('tripSwitcher');
+  const trips=Object.values(state.trips).sort((a,b)=>a.name.localeCompare(b.name));
+  sw.innerHTML=trips.map(t=>`<option value="${t.id}" ${t.id===state.activeTripId?'selected':''}>${esc(t.name)}</option>`).join('');
+  // Update meta line
+  const t=activeTrip();
+  if(t){
+    const days=t.days.length;
+    const dateRange=t.startDate&&t.endDate?`${t.startDate} t/m ${t.endDate}`:'datums niet ingesteld';
+    $('tripMeta').textContent=`${dateRange} · ${days} dag${days===1?'':'en'} · ${t.locations?Object.keys(t.locations).length:0} locatie(s)`;
+  }
+}
+
+function renderTripsList(){
+  const trips=Object.values(state.trips).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+  $('tripsList').innerHTML=trips.map(t=>{
+    const active=t.id===state.activeTripId;
+    const progress=t.days.filter(d=>d.done).length;
+    return `<div class="card ${active?'priority':''}">
+      <h3>${esc(t.name)} ${active?'<span class="badge">Actief</span>':''}</h3>
+      <p class="muted">${t.startDate||'?'} t/m ${t.endDate||'?'} · ${t.days.length} dagen · voortgang ${progress}/${t.days.length}</p>
+      <p>${esc(t.philosophy.text||'').substring(0,140)}${(t.philosophy.text||'').length>140?'...':''}</p>
+      <div class="row">
+        ${!active?`<button class="btn" onclick="switchTrip('${t.id}')">Open deze reis</button>`:''}
+        <button class="btn secondary" onclick="renameTrip('${t.id}')">Hernoem</button>
+        <button class="btn secondary" onclick="duplicateTrip('${t.id}')">Dupliceer</button>
+        <button class="btn secondary" onclick="exportSingleTrip('${t.id}')">Export</button>
+        <button class="btn danger" onclick="deleteTrip('${t.id}')">Verwijder</button>
+      </div>
+    </div>`;
+  }).join('')||'<p class="empty">Nog geen reizen. Klik "+ Nieuwe reis" om te starten.</p>';
+}
+
+// ============== TABS / THEME ==============
+const tabNames=[
+  ['dashboard','Dashboard'],['today','Vandaag'],['planning','Planning'],['checklist','Checklist'],
+  ['traffic','Verkeer'],['map','Kaart'],['reservations','Reserveringen'],
+  ['ai','AI Concierge'],['memory','Reisdagboek'],['travelbook','Reisboek'],
+  ['settings','Instellingen'],['trips','Reizen'],['diagnose','Diagnose'],['test','Backtest']
+];
+function initTabs(){
+  $('tabs').innerHTML=tabNames.map((t,i)=>`<button class="tab ${i?'':'active'}" data-tabid="${t[0]}" onclick="showTab('${t[0]}',this)">${t[1]}</button>`).join('');
+  const tabs=$('tabs');
+  function updateTabsMask(){
+    const atEnd=tabs.scrollLeft+tabs.clientWidth>=tabs.scrollWidth-2;
+    const noOverflow=tabs.scrollWidth<=tabs.clientWidth+2;
+    tabs.classList.toggle('atEnd',atEnd||noOverflow);
+  }
+  tabs.addEventListener('scroll',updateTabsMask,{passive:true});
+  window.addEventListener('resize',updateTabsMask);
+  setTimeout(updateTabsMask,50);
+}
+function showTab(id,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const view=$(id)||$('dashboard');
+  view.classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tabid===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function applyTheme(){
+  document.body.classList.toggle('brightmode',state.theme==='bright');
+  $('themeBtn').textContent=state.theme==='bright'?'☾':'☀';
+  $('themeBtn').title=state.theme==='bright'?'Wissel naar donker':'Wissel naar licht';
+}
+function toggleTheme(){state.theme=state.theme==='bright'?'dark':'bright';applyTheme();saveOnly();}
+
+// ============== HELPERS ==============
+function loc(d){const t=activeTrip();return (t.locations&&t.locations[d.loc])||{name:d.loc||'?',area:'',lat:52,lon:5,icon:'📍'}}
+function getCurrentDay(){
+  const t=activeTrip();
+  const today=new Date();today.setHours(0,0,0,0);
+  for(const d of t.days){
+    const dd=new Date(d.date);dd.setHours(0,0,0,0);
+    if(dd.getTime()===today.getTime())return d;
+  }
+  if(!t.days.length)return null;
+  const first=new Date(t.days[0].date);first.setHours(0,0,0,0);
+  if(today<first)return t.days[0];
+  return t.days[t.days.length-1];
+}
+function getNextOpenDay(){const t=activeTrip();return t.days.find(d=>!d.done)||t.days[t.days.length-1]}
+function progress(){return activeTrip().days.filter(d=>d.done).length}
+function isDuringTrip(){
+  const t=activeTrip();
+  if(!t.days.length)return false;
+  const today=new Date();today.setHours(0,0,0,0);
+  const first=new Date(t.days[0].date);first.setHours(0,0,0,0);
+  const last=new Date(t.days[t.days.length-1].date);last.setHours(0,0,0,0);
+  return today>=first&&today<=last;
+}
+function tripHeaderUpdate(){
+  const t=activeTrip();
+  $('appTitle').textContent=t.name||'Travel Companion';
+  $('appSubtitle').textContent=t.philosophy.title||'Persoonlijke reisplanner';
+  document.title=`${t.name} · MOED Travel Companion`;
+}
+// ============== ALERTS ==============
+function alertsForDay(d){
+  let a=[];
+  const t=activeTrip();
+  if(d.ztl)a.push(['ztl','⚠ ZTL-zone vandaag: rijverbod in historisch centrum. Parkeer buiten de muren.']);
+  let res=t.reservations.filter(x=>+x.day===+d.id);
+  if(res.length)a.push(['ok',`${res.length} reservering(en) gekoppeld. Check tijden, boekingsnummer en parkeerinfo.`]);
+  let tomorrow=t.days.find(x=>x.id===d.id+1);
+  if(tomorrow){
+    let resTomorrow=t.reservations.filter(x=>+x.day===tomorrow.id);
+    if(resTomorrow.length)a.push(['warn',`Morgen ${resTomorrow.length} reservering(en) — bel/bevestig zo nodig vandaag.`]);
+    if(tomorrow.ztl)a.push(['warn',`Morgen ZTL-zone (${tomorrow.title}) — plan parkeren vooraf.`]);
+    if((tomorrow.traffic||'').toLowerCase().includes('vroeg'))a.push(['warn','Morgen vroeg op: bagage en planning vanavond klaarzetten.']);
+  }
+  if((d.traffic||'').toLowerCase().includes('vroeg'))a.push(['warn','Vroeg starten aanbevolen.']);
+  let prev=t.days.find(x=>x.id===d.id-1);
+  if(prev?.energy==='laag')a.push(['warn','Gisteren lage energie: kies vandaag lichter.']);
+  if(!a.length)a.push(['ok','Geen kritieke aandachtspunten. Houd deze dag flexibel.']);
+  return a;
+}
+
+// ============== RENDER: Dashboard ==============
+function renderDashboard(){
+  const t=activeTrip();
+  $('dashboardTitle').textContent=`Reisdashboard — ${t.name}`;
+  $('philosophyTitle').textContent=t.philosophy.title||'—';
+  $('philosophyText').textContent=t.philosophy.text||'—';
+  $('philosophyBadges').innerHTML=(t.philosophy.badges||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join('');
+  $('progressMetric').textContent=`${progress()}/${t.days.length}`;
+  const d=isDuringTrip()?getCurrentDay():getNextOpenDay();
+  if(d){
+    const l=loc(d);
+    const dateLabel=isDuringTrip()?'Vandaag':'Eerstvolgend';
+    $('nextDay').innerHTML=`<p class="muted" style="margin:0 0 4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase">${dateLabel}</p><h3>${esc(d.date)} · ${esc(d.title)}</h3><p>${esc(d.focus)}</p><p class="muted">${l.icon} ${esc(l.name)} · ${esc(l.area)}</p>`;
+  }else{
+    $('nextDay').innerHTML='<p class="empty">Geen dagen ingepland.</p>';
+  }
+  $('qualityMini').innerHTML=`<div class="testrow"><span>✓</span><div>Planning: ${t.days.length} dagen</div></div><div class="testrow"><span>✓</span><div>Reserveringen: ${t.reservations.length}</div></div><div class="testrow"><span>✓</span><div>Locaties: ${Object.keys(t.locations).length}</div></div><div class="testrow"><span>${navigator.onLine?'✓':'⚠'}</span><div>Verbinding: ${navigator.onLine?'online':'offline'}</div></div>`;
+}
+
+// ============== RENDER: Today ==============
+function renderToday(){
+  const t=activeTrip();
+  const d=isDuringTrip()?getCurrentDay():getNextOpenDay();
+  if(!d){$('todayView').innerHTML='<p class="empty">Geen dagen ingepland. Ga naar Instellingen om dagen toe te voegen.</p>';return}
+  const l=loc(d);
+  const res=t.reservations.filter(r=>+r.day===+d.id).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));
+  const label=isDuringTrip()?'Vandaag':'Eerstvolgende dag';
+  $('todayView').innerHTML=`
+    <div class="card todayHero">
+      <div class="kpi">${label}</div>
+      <h3>${l.icon} ${esc(d.date)} · ${esc(d.title)}${d.ztl?'<span class="ztlBadge">ZTL</span>':''}</h3>
+      <p class="metric" style="font-size:24px">${esc(d.focus)}</p>
+      <p>${esc(d.plan)}</p>
+      ${alertsForDay(d).map(x=>`<div class="alert ${x[0]}">${esc(x[1])}</div>`).join('')}
+      <div class="timeline">
+        <div class="step"><b>Ochtend</b><p>${esc(d.morning||'-')}</p></div>
+        <div class="step"><b>Lunch</b><p>${esc(d.lunch||'-')}</p></div>
+        <div class="step"><b>Middag</b><p>${esc(d.afternoon||'-')}</p></div>
+        <div class="step"><b>Avond</b><p>${esc(d.evening||'-')}</p></div>
+        <div class="step"><b>Verkeer</b><p>${esc(d.traffic||'-')}</p><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.name+' '+l.area)}">Open omgeving</a></div>
+      </div>
+      <details open><summary>Reserveringen vandaag</summary>${res.length?res.map(r=>`<div class="alert ok">${r.time?`<span class="timeBadge">${esc(r.time)}</span>`:''}<b>${esc(r.title)}</b>${r.duration?` <span class="muted">(${esc(r.duration)}u)</span>`:''}<br>Boeking: ${esc(r.code)||'-'}<br>${esc(r.notes||'')}</div>`).join(''):'<p class="empty">Geen reserveringen gekoppeld.</p>'}</details>
+      <details><summary>Dag snel aanpassen</summary>
+        <label>Plan<textarea oninput="updDayLive(${d.id},'plan',this.value)">${esc(d.plan)}</textarea></label>
+        <label>Reisverslag<textarea oninput="updDayLive(${d.id},'journal',this.value)">${esc(d.journal)}</textarea></label>
+      </details>
+    </div>`;
+}
+
+// ============== RENDER: Planning ==============
+function renderDays(){
+  const t=activeTrip();
+  $('days').innerHTML=t.days.length?t.days.map(d=>{
+    const l=loc(d);
+    return `<article class="dayCard" data-search="${esc((d.date+' '+d.title+' '+d.focus+' '+d.plan+' '+l.name+' '+l.area).toLowerCase())}">
+      <div class="dayTop">
+        <div class="dayTitle">
+          <div class="dayIcon">${l.icon}</div>
+          <div>
+            <span class="badge">Dag ${d.id}</span>
+            <span class="badge">${esc(d.date)}</span>
+            ${d.ztl?'<span class="ztlBadge">ZTL</span>':''}
+            <h3 contenteditable="true" oninput="updDayLive(${d.id},'title',this.textContent)" style="outline:none;border-bottom:1px dashed transparent" onfocus="this.style.borderBottomColor='#7b6320'" onblur="this.style.borderBottomColor='transparent'">${esc(d.title)}</h3>
+            <p class="muted">${esc(l.name)} · ${esc(l.area)}</p>
+          </div>
+        </div>
+        <div class="dayActions">
+          <label class="pill"><input type="checkbox" ${d.done?'checked':''} onchange="updDayLive(${d.id},'done',this.checked)"> gedaan</label>
+          <select onchange="updDayLive(${d.id},'energy',this.value)" aria-label="Energie niveau">
+            <option value="">Energie?</option>
+            <option ${d.energy==='laag'?'selected':''}>laag</option>
+            <option ${d.energy==='normaal'?'selected':''}>normaal</option>
+            <option ${d.energy==='hoog'?'selected':''}>hoog</option>
+          </select>
+          <button class="btn secondary" onclick="removeDay(${d.id})" title="Verwijder dag" style="padding:6px 10px;min-height:32px;font-size:12px">✕</button>
+        </div>
+      </div>
+      <p><b>Focus:</b> <span contenteditable="true" oninput="updDayLive(${d.id},'focus',this.textContent)">${esc(d.focus)}</span></p>
+      <div class="itinerary">
+        <div class="ibox"><b>Ochtend</b><p contenteditable="true" oninput="updDayLive(${d.id},'morning',this.textContent)">${esc(d.morning||'')}</p></div>
+        <div class="ibox"><b>Lunchsuggestie</b><p contenteditable="true" oninput="updDayLive(${d.id},'lunch',this.textContent)">${esc(d.lunch||'')}</p></div>
+        <div class="ibox"><b>Middag</b><p contenteditable="true" oninput="updDayLive(${d.id},'afternoon',this.textContent)">${esc(d.afternoon||'')}</p></div>
+        <div class="ibox"><b>Avond</b><p contenteditable="true" oninput="updDayLive(${d.id},'evening',this.textContent)">${esc(d.evening||'')}</p></div>
+        <div class="ibox"><b>Verkeer/route</b><p contenteditable="true" oninput="updDayLive(${d.id},'traffic',this.textContent)">${esc(d.traffic||'')}</p></div>
+      </div>
+      <details><summary>Eigen planning, datum, locatie, ZTL en foto's</summary>
+        <div class="row">
+          <label>Datum<input type="date" value="${esc(d.date)}" oninput="updDayLive(${d.id},'date',this.value)"></label>
+          <label>Locatie<select oninput="updDayLive(${d.id},'loc',this.value)">${Object.entries(t.locations).map(([k,l])=>`<option value="${k}" ${k===d.loc?'selected':''}>${l.icon} ${esc(l.name)}</option>`).join('')}</select></label>
+          <label class="pill"><input type="checkbox" ${d.ztl?'checked':''} onchange="updDayLive(${d.id},'ztl',this.checked)"> ZTL-zone</label>
+        </div>
+        <label>Plan (vrij invoegen)<textarea oninput="updDayLive(${d.id},'plan',this.value)">${esc(d.plan)}</textarea></label>
+        <label>Foto's toevoegen (auto-gecomprimeerd)<input type="file" multiple accept="image/*" onchange="addPhotos(${d.id},event)"></label>
+        <label>Reisverslag<textarea placeholder="Mooiste moment, restaurant, grappige gebeurtenis..." oninput="updDayLive(${d.id},'journal',this.value)">${esc(d.journal)}</textarea></label>
+        <div class="photos">${(d.photos||[]).map(p=>`<img src="${p.data}" title="${esc(p.name)} — klik voor groot" alt="${esc(p.name)}" onclick="showPhoto('${p.data}')">`).join('')}</div>
+        ${(d.photos||[]).length?`<button class="btn danger" onclick="removeLastPhoto(${d.id})">Laatste foto verwijderen</button>`:''}
+      </details>
+    </article>`;
+  }).join(''):'<p class="empty">Geen dagen. Voeg dagen toe via de Instellingen-tab of "+ Voeg dag toe".</p>';
+}
+
+function updDayLive(id,key,val){
+  const t=activeTrip();
+  let d=t.days.find(x=>x.id===id);
+  if(!d)return;
+  d[key]=val;
+  if(key==='done'||key==='energy'||key==='ztl'||key==='loc'||key==='date'){
+    debouncedSave();
+    setTimeout(()=>{renderDashboard();renderToday();updateStorageInfo()},50);
+  }else{
+    debouncedSave();
+  }
+}
+
+function addNewDay(){
+  const t=activeTrip();
+  const lastDay=t.days[t.days.length-1];
+  const newDate=lastDay?new Date(new Date(lastDay.date).getTime()+86400000).toISOString().slice(0,10):new Date().toISOString().slice(0,10);
+  const newId=t.days.length?Math.max(...t.days.map(d=>d.id))+1:1;
+  const defaultLoc=Object.keys(t.locations)[0]||'base';
+  t.days.push({id:newId,date:newDate,title:`Dag ${newId}`,loc:defaultLoc,focus:'',plan:'',done:false,energy:'',journal:'',photos:[],morning:'',lunch:'',afternoon:'',evening:'',traffic:'',ztl:false});
+  save();
+  toast('✓ Dag toegevoegd','ok');
+}
+
+function removeDay(id){
+  if(!confirm(`Dag ${id} verwijderen?`))return;
+  const t=activeTrip();
+  t.days=t.days.filter(d=>d.id!==id);
+  // Renumber
+  t.days.forEach((d,i)=>d.id=i+1);
+  // Also update reservation day refs
+  t.reservations=t.reservations.filter(r=>r.day<=t.days.length);
+  save();
+}
+
+function filterDays(query){
+  const q=(query||'').toLowerCase().trim();
+  document.querySelectorAll('#days .dayCard').forEach(card=>{
+    card.style.display=(!q||card.dataset.search.includes(q))?'':'none';
+  });
+}
+
+function jumpToToday(){
+  showTab('planning');
+  const d=isDuringTrip()?getCurrentDay():getNextOpenDay();
+  if(!d)return;
+  setTimeout(()=>{
+    const cards=document.querySelectorAll('#days .dayCard');
+    if(cards[d.id-1])cards[d.id-1].scrollIntoView({behavior:'smooth',block:'start'});
+  },200);
+}
+
+function expandAllDetails(open){
+  const y=window.scrollY;
+  document.querySelectorAll('#days details').forEach(d=>d.open=open);
+  requestAnimationFrame(()=>window.scrollTo({top:y}));
+}
+
+// ============== PHOTOS ==============
+function compressImage(file,maxW=1600,quality=0.78){
+  return new Promise((resolve,reject)=>{
+    const fr=new FileReader();
+    fr.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const ratio=Math.min(1,maxW/img.width);
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.round(img.width*ratio);
+        canvas.height=Math.round(img.height*ratio);
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=reject;
+      img.src=fr.result;
+    };
+    fr.onerror=reject;
+    fr.readAsDataURL(file);
+  });
+}
+
+async function addPhotos(id,ev){
+  const t=activeTrip();
+  let d=t.days.find(x=>x.id===id);
+  if(!d)return;
+  const files=[...ev.target.files];
+  toast(`${files.length} foto('s) comprimeren...`,'ok');
+  for(const file of files){
+    try{
+      const compressed=await compressImage(file);
+      d.photos=d.photos||[];
+      d.photos.push({name:file.name,data:compressed,addedAt:new Date().toISOString()});
+      if(!saveOnly()){d.photos.pop();break}
+    }catch(e){toast('Foto verwerken mislukt: '+(e.message||e),'bad')}
+  }
+  ev.target.value='';
+  renderDays();renderJournal();updateStorageInfo();
+  toast('✓ Foto\'s toegevoegd','ok');
+}
+
+function removeLastPhoto(id){
+  const t=activeTrip();
+  let d=t.days.find(x=>x.id===id);
+  if(!d||!d.photos?.length)return;
+  if(!confirm('Laatste foto verwijderen?'))return;
+  d.photos.pop();save();
+}
+
+function showPhoto(src){$('lightboxImg').src=src;$('lightbox').classList.add('visible');}
+
+// ============== RENDER: Memory / Journal ==============
+function renderJournal(){
+  const t=activeTrip();
+  $('journal').innerHTML=t.days.map(d=>`<div class="card"><h3>${esc(d.date)} · ${esc(d.title)}</h3><p>${esc(d.journal)||'<span class="muted">Nog geen verslag.</span>'}</p><div class="photos">${(d.photos||[]).map(p=>`<img src="${p.data}" title="${esc(p.name)}" alt="${esc(p.name)}" onclick="showPhoto('${p.data}')">`).join('')}</div></div>`).join('');
+}
+
+// ============== RESERVATIONS ==============
+function renderSelects(){
+  const t=activeTrip();
+  if($('rDay'))$('rDay').innerHTML=t.days.map(d=>`<option value="${d.id}">${d.date} · ${esc(d.title)}</option>`).join('');
+}
+
+function addReservation(){
+  const t=activeTrip();
+  const files=[...$('rFiles').files];
+  const title=$('rTitle').value.trim();
+  if(!title){toast('Vul een titel in.','warn');return}
+  const r={id:Date.now(),day:+$('rDay').value,time:$('rTime').value||'',duration:$('rDuration').value||'',title,code:$('rCode').value,link:$('rLink').value,notes:$('rNotes').value,files:[]};
+  if(!files.length){t.reservations.push(r);clearResForm();save();toast('✓ Reservering toegevoegd','ok');return}
+  let left=files.length;
+  files.forEach(f=>{
+    let fr=new FileReader();
+    fr.onload=()=>{
+      r.files.push({name:f.name,data:fr.result});
+      if(--left===0){t.reservations.push(r);clearResForm();if(saveOnly()){toast('✓ Reservering met bijlage(n)','ok');renderAll()}}
+    };
+    fr.readAsDataURL(f);
+  });
+}
+
+function clearResForm(){['rTitle','rCode','rLink','rNotes','rTime','rDuration'].forEach(id=>$(id).value='');$('rFiles').value='';}
+
+function renderReservations(){
+  const t=activeTrip();
+  const sorted=[...t.reservations].sort((a,b)=>(+a.day-+b.day)||(a.time||'99').localeCompare(b.time||'99'));
+  $('resList').innerHTML=sorted.length?sorted.map(r=>{
+    let d=t.days.find(x=>x.id===+r.day);
+    return `<div class="card"><h3>${r.time?`<span class="timeBadge">${esc(r.time)}</span>`:''}${esc(r.title)}${r.duration?` <span class="muted" style="font-size:14px">(${esc(r.duration)}u)</span>`:''}</h3><p class="muted">${d?esc(d.date+' · '+d.title):'Geen dag'}</p><p><b>Boeking:</b> ${esc(r.code)||'-'}<br><b>Contact/link:</b> ${r.link?`<a target="_blank" rel="noopener" href="${esc(r.link)}">${esc(r.link)}</a>`:'-'}</p>${r.notes?`<p>${esc(r.notes)}</p>`:''}${(r.files||[]).map(f=>`<a class="pill" download="${esc(f.name)}" href="${f.data}">📎 ${esc(f.name)}</a>`).join('')}<br><button class="btn danger" onclick="delRes(${r.id})">Verwijder</button></div>`;
+  }).join(''):'<p class="empty">Nog geen reserveringen.</p>';
+}
+
+function delRes(id){
+  if(!confirm('Reservering verwijderen?'))return;
+  const t=activeTrip();
+  t.reservations=t.reservations.filter(r=>r.id!==id);
+  save();
+}
+
+// ============== TRAFFIC / MAP ==============
+function mapsUrl(from,to){return 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(from)+'&destination='+encodeURIComponent(to)+'&travelmode=driving'}
+
+function renderTraffic(){
+  const t=activeTrip();
+  // ZTL warning if any day has ztl
+  const ztlDays=t.days.filter(d=>d.ztl);
+  let alerts='';
+  if(ztlDays.length){
+    alerts=`<div class="alert ztl"><b>⚠ ZTL-zones in deze reis:</b> ${ztlDays.map(d=>esc(d.title)+' (dag '+d.id+')').join(', ')}. Italiaanse historische centra met camera-gehandhaafd rijverbod (boete €80–150). Parkeer altijd buiten de muren.</div>`;
+  }
+  $('trafficAlerts').innerHTML=alerts;
+  $('trafficRoutes').innerHTML=t.routes.length?t.routes.map(r=>`<div class="card"><h3>${esc(r.name)}</h3><p class="muted">${esc(r.dist||'')} ${r.duration?'· '+esc(r.duration):''}</p><a class="btn" target="_blank" rel="noopener" href="${mapsUrl(r.from,r.to)}">Open live route</a></div>`).join(''):'<p class="empty">Geen routes ingesteld. Voeg toe via Instellingen.</p>';
+  $('trafficNotes').value=t.trafficNotes||'';
+  $('trafficPrompt').value=`Je bent onze reisleider. Check op basis van live verkeersinformatie de beste route voor: ${t.name}. Routes: ${t.routes.map(r=>r.name+': '+r.from+' naar '+r.to).join(' | ')||'(geen)'}. Notities: ${t.trafficNotes||'-'}`;
+}
+
+function renderMap(){
+  const t=activeTrip();
+  $('mapView').innerHTML=Object.entries(t.locations).map(([k,l])=>`<div class="mapPin"><h3>${l.icon} ${esc(l.name)}</h3><p class="muted">${esc(l.area)}</p><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.name+' '+l.area)}">Open kaart</a><a class="btn secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/restaurants+near+${encodeURIComponent(l.name+' '+l.area)}">Restaurants</a><a class="btn secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/farmacia+near+${encodeURIComponent(l.name+' '+l.area)}">Apotheek</a></div>`).join('')+t.routes.map(r=>`<div class="mapPin"><h3>🚗 ${esc(r.name)}</h3><p class="muted">${esc(r.dist||'')} ${r.duration?'· '+esc(r.duration):''}</p><a class="btn secondary" target="_blank" rel="noopener" href="${mapsUrl(r.from,r.to)}">Live route</a></div>`).join('');
+}
+
+// ============== WEATHER ==============
+async function fetchWeather(){
+  const t=activeTrip();
+  const tripStart=new Date(t.days[0]?.date||Date.now());
+  const today=new Date();
+  const daysToTrip=Math.ceil((tripStart-today)/86400000);
+  if(daysToTrip>14){toast(`Weer beschikbaar vanaf 14 dagen vóór reis (nog ${daysToTrip} dagen).`,'warn');return}
+  toast('Weer ophalen...','ok');
+  const entries=Object.entries(t.locations).filter(([k,l])=>k!=='return'&&l.lat&&l.lon);
+  await Promise.all(entries.map(async([k,l])=>{
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${l.lat}&longitude=${l.lon}&current=temperature_2m,precipitation,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=14`;
+      const res=await fetch(url);
+      if(!res.ok)throw new Error('HTTP '+res.status);
+      t.weather[k]=await res.json();
+    }catch(e){t.weather[k]={error:String(e.message||e)}}
+  }));
+  saveOnly();renderWeather();toast('✓ Weer bijgewerkt','ok');
+}
+
+function wcode(c){
+  if(c===0)return'☀️ helder';
+  if([1,2,3].includes(c))return'⛅ wisselend';
+  if([45,48].includes(c))return'🌫️ mist';
+  if([51,53,55,61,63,65,80,81,82].includes(c))return'🌧️ regen';
+  if([95,96,99].includes(c))return'⛈️ onweer';
+  return'🌤️ variabel';
+}
+
+function renderWeather(){
+  const t=activeTrip();
+  if(!t.days.length){$('weather').innerHTML='<p class="empty">Geen dagen.</p>';return}
+  const tripStart=new Date(t.days[0].date);
+  const today=new Date();
+  const daysToTrip=Math.ceil((tripStart-today)/86400000);
+  $('weather').innerHTML=Object.entries(t.locations).filter(([k])=>k!=='return').map(([k,l])=>{
+    let w=t.weather[k];
+    let html='<p class="muted">Nog niet opgehaald.</p>';
+    if(daysToTrip>14)html=`<p class="muted">Voorspelling beschikbaar vanaf 14 dagen vóór vertrek (nog ${daysToTrip} dagen).</p>`;
+    else if(w?.current)html=`<p><b>${Math.round(w.current.temperature_2m)}°C</b> · wind ${Math.round(w.current.wind_speed_10m)} km/u · neerslag ${w.current.precipitation} mm</p><table><tr><th>Dag</th><th>Weer</th><th>Temp</th></tr>${w.daily.time.slice(0,7).map((tm,i)=>`<tr><td>${tm}</td><td>${wcode(w.daily.weather_code[i])}</td><td>${Math.round(w.daily.temperature_2m_min[i])}-${Math.round(w.daily.temperature_2m_max[i])}°C</td></tr>`).join('')}</table>`;
+    if(w?.error)html=`<p class="bad">${esc(w.error)}</p>`;
+    return `<div class="card weatherbox"><h3>${l.icon} ${esc(l.name)}</h3>${html}</div>`;
+  }).join('')+`<div class="card"><h3>Update</h3><p class="muted">Open-Meteo, gratis en offline-vriendelijk.</p><button class="btn" onclick="fetchWeather()">Ververs weer</button></div>`;
+}
+
+// ============== BALANCE ==============
+function analyseBalance(){
+  const t=activeTrip();
+  let recent=t.days.filter(d=>d.done||d.energy).slice(-5);
+  let low=recent.filter(d=>d.energy==='laag').length;
+  let high=recent.filter(d=>d.energy==='hoog').length;
+  let adv='Balans is goed. Houd structuur licht en laat ruimte voor spontane keuzes.';
+  let cls='ok';
+  if(low>=2){adv='Advies: plan morgen rustiger.';cls='warn'}
+  if(high>=3){adv='Advies: extra wauw-moment kan, maar borg daarna een herstelmoment.';cls='warn'}
+  $('balanceAdvice').className='alert '+cls;$('balanceAdvice').textContent=adv;
+}
+
+// ============== CHECKLIST ==============
+function renderChecklist(){
+  const t=activeTrip();
+  $('checklistView').innerHTML=t.checklistGroups.map((g,gi)=>`<div class="card"><h3>${esc(g.title)} <button class="btn secondary" onclick="renameGroup(${gi})" style="font-size:11px;padding:3px 8px;min-height:24px">✎</button></h3><div class="checklist">${g.items.map((item,ii)=>{
+    const key=`${gi}_${ii}`;
+    const checked=t.checklist[key]?'checked':'';
+    return `<label><input type="checkbox" ${checked} onchange="toggleChecklist('${key}',this.checked)"><span>${esc(item)}</span><button class="btn secondary" onclick="deleteCheckItem(${gi},${ii})" style="margin-left:auto;padding:2px 6px;min-height:22px;font-size:11px">✕</button></label>`;
+  }).join('')}</div></div>`).join('')+`<div class="card"><h3>Voortgang</h3><p class="muted">${checklistProgress()}</p></div>`;
+  // Fill the "add new item" group select
+  if($('newCheckGroup'))$('newCheckGroup').innerHTML=t.checklistGroups.map((g,i)=>`<option value="${i}">${esc(g.title)}</option>`).join('');
+}
+
+function checklistProgress(){
+  const t=activeTrip();
+  const total=t.checklistGroups.reduce((a,g)=>a+g.items.length,0);
+  const done=Object.values(t.checklist).filter(Boolean).length;
+  return `${done}/${total} afgevinkt`;
+}
+
+function toggleChecklist(key,checked){activeTrip().checklist[key]=checked;debouncedSave();}
+
+function addChecklistItem(){
+  const t=activeTrip();
+  const gi=+$('newCheckGroup').value;
+  const txt=$('newCheckText').value.trim();
+  if(!txt)return;
+  t.checklistGroups[gi].items.push(txt);
+  $('newCheckText').value='';
+  save();
+}
+
+function deleteCheckItem(gi,ii){
+  const t=activeTrip();
+  t.checklistGroups[gi].items.splice(ii,1);
+  // Clean orphan checklist entries (shift down)
+  const newCheck={};
+  Object.keys(t.checklist).forEach(k=>{
+    const [g,i]=k.split('_').map(Number);
+    if(g!==gi||i<ii)newCheck[k]=t.checklist[k];
+    else if(g===gi&&i>ii)newCheck[`${g}_${i-1}`]=t.checklist[k];
+  });
+  t.checklist=newCheck;
+  save();
+}
+
+function renameGroup(gi){
+  const t=activeTrip();
+  const newName=prompt('Naam van categorie:',t.checklistGroups[gi].title);
+  if(newName&&newName.trim()){t.checklistGroups[gi].title=newName.trim();save()}
+}
+
+// ============== SETTINGS (per trip) ==============
+function renderSettings(){
+  const t=activeTrip();
+  $('settingsView').innerHTML=`
+    <div class="card">
+      <h3>Algemeen</h3>
+      <label>Reisnaam<input value="${esc(t.name)}" oninput="t_field('name',this.value)"></label>
+      <div class="row">
+        <label>Startdatum<input type="date" value="${esc(t.startDate)}" oninput="t_field('startDate',this.value)"></label>
+        <label>Einddatum<input type="date" value="${esc(t.endDate)}" oninput="t_field('endDate',this.value)"></label>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Reisfilosofie</h3>
+      <label>Titel<input value="${esc(t.philosophy.title)}" oninput="t_phil('title',this.value)"></label>
+      <label>Tekst<textarea oninput="t_phil('text',this.value)">${esc(t.philosophy.text)}</textarea></label>
+      <label>Badges (komma-gescheiden)<input value="${esc((t.philosophy.badges||[]).join(', '))}" oninput="t_phil_badges(this.value)"></label>
+    </div>
+    <div class="card">
+      <h3>Locaties</h3>
+      <p class="muted">Locaties met coördinaten voor weer en kaart.</p>
+      <div id="locList">${Object.entries(t.locations).map(([k,l])=>`
+        <div class="ibox" style="margin:8px 0">
+          <div class="row">
+            <label>Sleutel<input value="${esc(k)}" disabled style="opacity:.6"></label>
+            <label>Naam<input value="${esc(l.name)}" oninput="t_loc('${k}','name',this.value)"></label>
+            <label>Gebied<input value="${esc(l.area)}" oninput="t_loc('${k}','area',this.value)"></label>
+            <label>Icon<input value="${esc(l.icon)}" oninput="t_loc('${k}','icon',this.value)"></label>
+            <label>Latitude<input type="number" step="0.0001" value="${l.lat}" oninput="t_loc('${k}','lat',parseFloat(this.value))"></label>
+            <label>Longitude<input type="number" step="0.0001" value="${l.lon}" oninput="t_loc('${k}','lon',parseFloat(this.value))"></label>
+            <button class="btn danger" onclick="deleteLoc('${k}')">Verwijder</button>
+          </div>
+        </div>`).join('')}</div>
+      <div class="row">
+        <label>Nieuwe locatie-sleutel<input id="newLocKey" placeholder="bijv. paris"></label>
+        <label>Naam<input id="newLocName" placeholder="Hotel naam"></label>
+        <label>Latitude<input id="newLocLat" type="number" step="0.0001" placeholder="48.8566"></label>
+        <label>Longitude<input id="newLocLon" type="number" step="0.0001" placeholder="2.3522"></label>
+      </div>
+      <button class="btn" onclick="addLocation()">+ Locatie toevoegen</button>
+    </div>
+    <div class="card">
+      <h3>Routes</h3>
+      <p class="muted">Auto-routes tussen locaties (voor Verkeer-tab).</p>
+      <div id="routeList">${t.routes.map((r,i)=>`
+        <div class="ibox" style="margin:8px 0">
+          <div class="row">
+            <label>Naam<input value="${esc(r.name)}" oninput="t_route(${i},'name',this.value)"></label>
+            <label>Van<input value="${esc(r.from)}" oninput="t_route(${i},'from',this.value)"></label>
+            <label>Naar<input value="${esc(r.to)}" oninput="t_route(${i},'to',this.value)"></label>
+            <label>Afstand<input value="${esc(r.dist||'')}" oninput="t_route(${i},'dist',this.value)"></label>
+            <label>Duur<input value="${esc(r.duration||'')}" oninput="t_route(${i},'duration',this.value)"></label>
+            <button class="btn danger" onclick="deleteRoute(${i})">Verwijder</button>
+          </div>
+        </div>`).join('')}</div>
+      <button class="btn" onclick="addRoute()">+ Route toevoegen</button>
+    </div>
+    <div class="card">
+      <h3>Checklist-categorie toevoegen</h3>
+      <div class="row">
+        <label>Nieuwe categorie<input id="newGroupName" placeholder="Bijv. Sport-uitrusting"></label>
+      </div>
+      <button class="btn" onclick="addChecklistGroup()">+ Categorie toevoegen</button>
+    </div>`;
+}
+
+function t_field(k,v){activeTrip()[k]=v;debouncedSave();tripHeaderUpdate();renderTripSwitcher();}
+function t_phil(k,v){activeTrip().philosophy[k]=v;debouncedSave();renderDashboard();}
+function t_phil_badges(v){activeTrip().philosophy.badges=v.split(',').map(s=>s.trim()).filter(Boolean);debouncedSave();renderDashboard();}
+function t_loc(k,field,v){activeTrip().locations[k][field]=v;debouncedSave();}
+function t_route(i,field,v){activeTrip().routes[i][field]=v;debouncedSave();}
+
+function addLocation(){
+  const t=activeTrip();
+  const key=$('newLocKey').value.trim();
+  const name=$('newLocName').value.trim();
+  const lat=parseFloat($('newLocLat').value);
+  const lon=parseFloat($('newLocLon').value);
+  if(!key||!name){toast('Sleutel en naam zijn verplicht.','warn');return}
+  if(t.locations[key]){toast('Sleutel bestaat al.','warn');return}
+  t.locations[key]={name,area:'',lat:lat||52,lon:lon||5,icon:'📍'};
+  ['newLocKey','newLocName','newLocLat','newLocLon'].forEach(id=>$(id).value='');
+  save();
+}
+
+function deleteLoc(key){
+  if(!confirm('Locatie verwijderen?'))return;
+  const t=activeTrip();
+  // Check if any day uses it
+  const used=t.days.filter(d=>d.loc===key).length;
+  if(used&&!confirm(`${used} dag(en) gebruiken deze locatie. Toch verwijderen?`))return;
+  delete t.locations[key];
+  delete t.weather[key];
+  save();
+}
+
+function addRoute(){
+  activeTrip().routes.push({name:'Nieuwe route',from:'',to:'',dist:'',duration:''});
+  save();
+}
+
+function deleteRoute(i){
+  if(!confirm('Route verwijderen?'))return;
+  activeTrip().routes.splice(i,1);
+  save();
+}
+
+function addChecklistGroup(){
+  const t=activeTrip();
+  const name=$('newGroupName').value.trim();
+  if(!name)return;
+  t.checklistGroups.push({title:name,items:[]});
+  $('newGroupName').value='';
+  save();
+}
+
+// ============== AI ==============
+function buildContext(){
+  const t=activeTrip();
+  return JSON.stringify({trip:t.name,dates:`${t.startDate} t/m ${t.endDate}`,philosophy:t.philosophy,question:$('aiQuestion').value,days:t.days,reservations:t.reservations.map(r=>({...r,files:(r.files||[]).map(f=>f.name)})),weather:t.weather,trafficNotes:t.trafficNotes},null,2);
+}
+
+async function runAI(){
+  const prompt=`Je bent een exclusieve reisconcierge. Geef concreet reisadvies met timing, lunch, route, rust/actie en alternatief bij slecht weer.\n\n${buildContext()}`;
+  if($('aiMode').value==='copy'){
+    try{await navigator.clipboard.writeText(prompt);$('aiResult').textContent='Prompt gekopieerd. Plak in ChatGPT of Claude.';toast('✓ Prompt gekopieerd','ok')}catch(e){$('aiResult').textContent=prompt}
+    return;
+  }
+  const key=$('apiKey').value.trim();
+  if(!key){$('aiResult').innerHTML='<span class="bad">Geen API-key.</span>';return}
+  const model=$('aiModel').value||'gpt-4o-mini';
+  $('aiResult').textContent='AI denkt mee...';
+  try{
+    const res=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model,messages:[{role:'user',content:prompt}],temperature:0.7})});
+    if(!res.ok){const err=await res.text();$('aiResult').innerHTML=`<span class="bad">API-fout (${res.status}): ${esc(err.substring(0,300))}</span>`;return}
+    const data=await res.json();
+    $('aiResult').textContent=data.choices?.[0]?.message?.content||JSON.stringify(data);
+  }catch(e){$('aiResult').innerHTML='<span class="bad">'+esc(String(e.message||e))+'</span>'}
+}
+
+async function copyAIContext(){try{await navigator.clipboard.writeText(buildContext());toast('✓ Context gekopieerd','ok')}catch(e){toast('Kopiëren mislukt','bad')}}
+async function copyTrafficPrompt(){try{await navigator.clipboard.writeText($('trafficPrompt').value);toast('✓ Prompt gekopieerd','ok')}catch(e){toast('Kopiëren mislukt','warn')}}
+
+// ============== EXPORT / IMPORT ==============
+function exportJSON(){
+  const trip=activeTrip();
+  const blob=new Blob([JSON.stringify(trip,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${trip.name.replace(/[^a-z0-9]/gi,'_')}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('✓ Reis-back-up gedownload','ok');
+}
+
+function exportSingleTrip(tripId){
+  const trip=state.trips[tripId];if(!trip)return;
+  const blob=new Blob([JSON.stringify(trip,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${trip.name.replace(/[^a-z0-9]/gi,'_')}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('✓ Reis geëxporteerd','ok');
+}
+
+function exportAllTrips(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`moed-all-trips-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('✓ Alle reizen geëxporteerd','ok');
+}
+
+function importJSON(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const imported=JSON.parse(fr.result);
+      // Detect format: full state vs single trip
+      if(imported.trips&&imported.activeTripId){
+        // Full state import
+        if(!confirm('Volledige state importeren overschrijft ALLE huidige reizen. Maak eerst een export!'))return;
+        state=normalizeState(imported);
+        save();
+        toast('✓ Alle reizen geïmporteerd','ok');
+      }else if(imported.days&&imported.name){
+        // Single trip import
+        const id=genId();
+        state.trips[id]={...imported,id,createdAt:imported.createdAt||new Date().toISOString()};
+        state.activeTripId=id;
+        save();
+        toast(`✓ Reis "${imported.name}" geïmporteerd`,'ok');
+      }else{
+        toast('Onbekend formaat. Verwacht een trip of state JSON.','bad');
+      }
+    }catch(e){toast('Import mislukt: '+e.message,'bad')}
+  };
+  fr.readAsText(f);
+  ev.target.value='';
+}
+
+// ============== TRAVEL BOOK ==============
+function renderTravelBook(){
+  const t=activeTrip();
+  // ALWAYS sync DOM from state (state is source of truth)
+  $('bookIntro').value=t.bookIntro||'';
+  const intro=t.bookIntro||'';
+  $('travelBookPreview').innerHTML=`<h1 style="text-align:center;font-style:italic">${esc(t.name)}</h1><p style="text-align:center;font-style:italic">${esc(intro)}</p>`+t.days.map(d=>`<div class="card"><h3>${esc(d.date)} · ${esc(d.title)}</h3><p><b>Plan:</b> ${esc(d.plan)}</p><p><b>Verslag:</b> ${esc(d.journal)||'<span class="muted">Nog geen verslag.</span>'}</p><div class="photos">${(d.photos||[]).slice(0,8).map(p=>`<img src="${p.data}" title="${esc(p.name)}" alt="${esc(p.name)}">`).join('')}</div></div>`).join('');
+}
+
+function printTravelBook(){
+  renderTravelBook();
+  const t=activeTrip();
+  const w=window.open('','_blank');
+  w.document.write(`<!doctype html><html><head><title>${esc(t.name)} — Reisboek</title><style>
+    @page{margin:18mm} body{font-family:'Cormorant Garamond',Georgia,serif;padding:0;color:#222}
+    h1,h2,h3{color:#8b6b19;font-family:'Cormorant Garamond',Georgia,serif} h1{font-style:italic;text-align:center}
+    .card{break-inside:avoid;page-break-inside:avoid;page-break-after:always;border:1px solid #ddd;border-radius:14px;padding:18px;margin:12px 0} .card:last-child{page-break-after:auto}
+    .photos img{max-width:160px;max-height:120px;object-fit:cover;border-radius:10px;margin:4px}
+    .muted{color:#888;font-style:italic} p{line-height:1.6;font-family:Georgia,serif}
+  </style></head><body>${$('travelBookPreview').innerHTML}</body></html>`);
+  w.document.close();w.focus();setTimeout(()=>w.print(),500);
+}
+
+// ============== DIAGNOSE ==============
+function detectStorageProblem(){try{const k='__moed_test__';localStorage.setItem(k,'1');const v=localStorage.getItem(k);localStorage.removeItem(k);if(v!=='1')throw new Error('Lezen werkt niet');return null}catch(e){return e.message}}
+
+function testSaveRoundTrip(){
+  const k=STORE+'_rt_'+Date.now();const v='RT_'+Math.random();
+  let writeOk=false,readOk=false;
+  try{localStorage.setItem(k,v);writeOk=true;readOk=(localStorage.getItem(k)===v);localStorage.removeItem(k)}catch(e){toast('Fout: '+e.message,'bad');return}
+  const stateOk=saveOnly();
+  const raw=localStorage.getItem(STORE);
+  alert(`Test resultaat:\n\n• Schrijven: ${writeOk?'✓ OK':'✗ MISLUKT'}\n• Lezen: ${readOk?'✓ OK':'✗ MISLUKT'}\n• State opgeslagen: ${stateOk?'✓ OK':'✗ MISLUKT'}\n• State grootte: ${raw?(new Blob([raw]).size/1024).toFixed(1)+' kB':'leeg'}\n• Storage-key: "${STORE}"\n• Aantal reizen: ${Object.keys(state.trips).length}`);
+  renderDiagnose();
+}
+
+function wipeStorage(){
+  if(!confirm('Alle data wissen?'))return;
+  if(!confirm('Heb je een back-up? Klik OK om door te gaan.'))return;
+  try{
+    ['moed_travel_companion_v8','moed_travel_companion_v7','moed_travel_companion_v6','moed_travel_companion_v5','moed_travel_companion_v3'].forEach(k=>localStorage.removeItem(k));
+    state=initialState();renderAll();toast('✓ Gewist','ok');
+  }catch(e){toast('Wissen mislukt: '+e.message,'bad')}
+}
+
+function renderDiagnose(){
+  const problem=detectStorageProblem();
+  const url=location.href;const protocol=location.protocol;
+  const raw=(()=>{try{return localStorage.getItem(STORE)}catch(e){return null}})();
+  const stateSize=raw?(new Blob([raw]).size/1024).toFixed(1):0;
+  const ua=navigator.userAgent;
+  const isSafari=/^((?!chrome|android).)*safari/i.test(ua);
+  let bannerLines=[];
+  if(problem){
+    bannerLines.push(`<b>⚠ Lokale opslag werkt NIET:</b> ${esc(problem)}`);
+    if(protocol==='file:'&&isSafari)bannerLines.push('Safari blokkeert localStorage voor lokale bestanden. Gebruik Chrome of Brave.');
+  }
+  const warn=$('storageWarning');
+  if(bannerLines.length){warn.innerHTML=bannerLines.join('<br>')+' <br>Gebruik JSON-export als noodoplossing.';warn.style.display='block'}
+  else warn.style.display='none';
+  let tips='';
+  if(protocol==='file:')tips='<div class="alert warn"><b>Tip:</b> Je opent dit bestand vanaf je schijf (<code>file://</code>). Tips:<ul style="margin-top:8px"><li>Open altijd vanaf <b>dezelfde locatie</b>.</li><li>Vermijd iCloud/Dropbox-sync.</li><li>Op iOS: gebruik <b>Chrome</b> of <b>Brave</b>.</li><li>Maak dagelijks JSON-back-up.</li></ul></div>';
+  $('diagnoseView').innerHTML=`${tips}<div class="card"><h3>Status</h3><div class="testrow"><span class="${problem?'bad':'ok'}">${problem?'✗':'✓'}</span><div><b>Schrijven & lezen:</b> ${problem?esc(problem):'werkt'}</div></div><div class="testrow"><span class="${raw?'ok':'bad'}">${raw?'✓':'✗'}</span><div><b>Data aanwezig:</b> ${raw?stateSize+' kB':'leeg'}</div></div><div class="testrow"><span>·</span><div><b>Reizen in opslag:</b> ${Object.keys(state.trips).length}</div></div><div class="testrow"><span>·</span><div><b>Sleutel:</b> <code>${esc(STORE)}</code></div></div><div class="testrow"><span>·</span><div><b>Pagina-bron:</b> <code style="word-break:break-all">${esc(url)}</code></div></div><div class="testrow"><span>·</span><div><b>Browser:</b> ${esc(ua.substring(0,100))}</div></div></div>`;
+}
+
+// ============== BACKTEST ==============
+function runBacktest(){
+  const t=activeTrip();
+  const tests=[
+    ['State heeft trips-object',!!state.trips&&typeof state.trips==='object'],
+    ['Minimaal 1 reis aanwezig',Object.keys(state.trips).length>=1],
+    ['Actieve reis bestaat',!!t],
+    ['Actieve reis heeft naam',!!t?.name],
+    ['Tabnavigatie aanwezig',document.querySelectorAll('.tab').length===tabNames.length],
+    ['Trip switcher rendert',!!$('tripSwitcher')&&$('tripSwitcher').options.length>=1],
+    ['Vandaag-modus rendert',!!$('todayView')&&$('todayView').innerHTML.length>50],
+    ['Planning rendert dagen',!!$('days')&&($('days').children.length===t.days.length||!t.days.length)],
+    ['Templates beschikbaar',Object.keys(TEMPLATES).length>=4],
+    ['Italië-template intact',TEMPLATES.italy2026.build().days.length===23],
+    ['Reserveringenmodule met tijd',!!$('rTime')],
+    ['Locaties bewerkbaar in settings',!!$('settingsView')],
+    ['Foto-compressie aanwezig',typeof compressImage==='function'],
+    ['Debounced save geïmplementeerd',typeof debouncedSave==='function'],
+    ['Toggle thema werkt',typeof toggleTheme==='function'],
+    ['Lightbox aanwezig',!!$('lightbox')],
+    ['Modal voor templates',!!$('modal')],
+    ['OpenAI chat/completions',document.documentElement.innerHTML.includes('chat/completions')],
+    ['Service Worker support',typeof navigator!=='undefined'&&'serviceWorker' in navigator],
+    ['LocalStorage werkt',(()=>{try{localStorage.setItem('moed_t','1');localStorage.removeItem('moed_t');return true}catch(e){return false}})()],
+    ['Multi-trip switchen mogelijk',typeof switchTrip==='function'],
+    ['Trip duplicate werkt',typeof duplicateTrip==='function'],
+    ['Single trip export',typeof exportSingleTrip==='function'],
+    ['Migratie van v7 ondersteund',typeof migrateFromV7==='function']
+  ];
+  const passed=tests.filter(t=>t[1]).length;
+  $('testResults').innerHTML=`<p class="muted">Resultaat: <b>${passed}/${tests.length}</b> tests geslaagd.</p>`+tests.map(t=>`<div class="testrow"><span class="${t[1]?'ok':'bad'}">${t[1]?'✓':'✗'}</span><div>${esc(t[0])}</div></div>`).join('');
+}
+
+// ============== MAIN RENDER ==============
+function renderAll(){
+  tripHeaderUpdate();
+  renderTripSwitcher();
+  renderDashboard();
+  renderToday();
+  renderDays();
+  renderJournal();
+  renderSelects();
+  renderReservations();
+  renderTraffic();
+  renderMap();
+  renderWeather();
+  renderChecklist();
+  renderTravelBook();
+  renderSettings();
+  renderTripsList();
+  renderDiagnose();
+  runBacktest();
+  updateStorageInfo();
+}
+
+// ============== INIT ==============
+if('serviceWorker' in navigator){
+  const swCode=`const CACHE='moed-v8';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.open(CACHE).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(net=>{if(net.ok&&e.request.url.startsWith(location.origin))c.put(e.request,net.clone());return net}).catch(()=>r))))});`;
+  try{const blob=new Blob([swCode],{type:'application/javascript'});navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{})}catch(e){}
+}
+window.addEventListener('online',()=>toast('✓ Weer online','ok'));
+window.addEventListener('offline',()=>toast('⚠ Offline','warn'));
+window.addEventListener('beforeunload',()=>{try{saveOnly()}catch(e){}});
+window.addEventListener('pagehide',()=>{try{saveOnly()}catch(e){}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){try{saveOnly()}catch(e){}}});
+
+initTabs();
+applyTheme();
+renderAll();
+
+// Bij verse start (geen opgeslagen data) meteen opslaan zodat de Italië-template wordt vastgelegd
+if(!localStorage.getItem(STORE)&&!detectStorageProblem())saveOnly();
+
+if(detectStorageProblem())toast('⚠ Opslag werkt niet — zie Diagnose-tab.','bad');
+</script>
+</body>
+</html>
